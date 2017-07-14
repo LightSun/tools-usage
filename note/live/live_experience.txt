@@ -1,0 +1,23 @@
+rtsp 转 rtmp. 
+用ffmpeg是可以的。但是必须要用服务器比如red5-server
+cmd: 
+   ffmpeg -i "rtsp://admin:12345@192.168.1.77:554/h264/ch1/main/av_stream" 
+-f flv -r 25 -s 640x480 -an "rtmp://localhost/oflaDemo/hello"
+    ffmpeg -i "rtsp://192.168.29.249:554/h264/ch1/main/av_stream" -f flv -r 25 -s 640x480 -an "rtmp://video-center.alivecdn.com/AppName/StreamName?vhost=live-test.class100.com"
+
+步骤：1，用vlc推流 rtsp://admin:12345@192.168.1.77:554/h264/ch1/main/av_stream 
+             ps: 用支持rtsp协议的摄像头也可以
+      2, 启动red服务器. 执行ffmpeg rtsp->rtmp命令推到远程的live-rtmp服务器。然后就可以播放了 
+
+ps: 详见 http://www.cuplayer.com/player/PlayerCode/RTSP/2014/0706/1419.html
+     rtsp://222.209.88.69:554/h264/ch1/main/av_stream
+
+
+linux docker安装
+         curl sSl https://get.daocloud.io/docker/|sh
+
+log and sync
+
+资源预处理， 逻辑处理.  动画处理. 生命周期组件. dialog处理.
+
+数据填充(async). loading
