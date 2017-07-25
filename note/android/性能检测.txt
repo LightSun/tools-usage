@@ -1,0 +1,6 @@
+
+google simpleperf 
+Ô´´úÂëµØÖ·£º
+https://android.googlesource.com/platform/system/extras/+/master/simpleperf
+
+systrace.
