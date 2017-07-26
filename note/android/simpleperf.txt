@@ -1,0 +1,6 @@
+
+simpleperf是一个性能检测工具 (google project)
+url: https://android.googlesource.com/platform/system/extras/+/master/simpleperf/
+
+注释出现问题的命令需要调整
+python annotate.py -s ../demo/SimpleperfExampleWithNative --addr2line G:\android\android-ndk-r12b-windows-x86_64\android-ndk-r12b\toolchains\aarch64-linux-android-4.9\prebuilt\windows-x86_64\bin\aarch64-linux-android-addr2line.exe

@@ -1,3 +1,6 @@
 
 查看ranking(star or etc.):  https://github-ranking.com/
 自己star 过的项目： https://github.com/stars
+
+新项目查看
+http://www.open-open.com/github/view/github2016-08-15.html
