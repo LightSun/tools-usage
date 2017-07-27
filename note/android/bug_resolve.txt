@@ -1,0 +1,3 @@
+oppo-r7
+现象:  adapter item翻转动画 出现ui越界问题
+解决： recycler view使用padding代替margin. 
