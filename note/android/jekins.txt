@@ -2,3 +2,4 @@ jekens android 入门
 http://www.android100.org/html/201506/22/156680.html
 http://www.jianshu.com/p/915c1ae69144
 http://blog.csdn.net/it_talk/article/details/50261229
+http://blog.csdn.net/mabeijianxi/article/details/52680283 （打包并上传）
