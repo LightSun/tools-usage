@@ -1,0 +1,15 @@
+
+android插件化的库
+   virtual apk 
+
+android路由。以路径形式访问页面
+   ARouter
+
+android Ae动画
+     lottie-android-2.0.0
+
+live: 雷晓华的帖子和github代码
+
+
+值得借鉴的;
+collapse-calendar --》android test api

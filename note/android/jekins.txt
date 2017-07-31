@@ -3,3 +3,7 @@ http://www.android100.org/html/201506/22/156680.html
 http://www.jianshu.com/p/915c1ae69144
 http://blog.csdn.net/it_talk/article/details/50261229
 http://blog.csdn.net/mabeijianxi/article/details/52680283 （打包并上传）
+
+jenkins android 步骤
+1, 挂载到tomcat/webapp/  下面. 创建环境变量JENKINS_CACHE
+2 , 打开http://localhost:8080/jenkins, 进入jenkins配置
