@@ -72,8 +72,12 @@ ffmpeg -i rtsp://192.168.2.101:5544/cam1 -vcodec copy -an -f flv rtmp://192.168.
 ffmpeg -i "rtsp://admin:12345@192.168.29.205:554/h264/ch1/main/av_stream" 
 -f flv -r 25 -s 640x480 -an "rtmp://localhost/oflaDemo/hello"
 
+obsÕ∆¡˜
+url: rtmp://pili-publish.class100.com/class100-test/ 
+√‹‘ø£∫livetest1?e=1495615889&token=BKHoK31ARygTF-sLKxEG_-S24vCQ3mMoEqVO-4in:iY7O6Dmx7rSGtcLdl8ObFPj96Cc=
 
-
+ url£∫ rtmp://video-center.alivecdn.com/AppName/
+ √‹‘ø£∫ StreamName?vhost=live-test.class100.com
 
 
 

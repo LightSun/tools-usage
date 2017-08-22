@@ -21,3 +21,35 @@ log and sync
 资源预处理， 逻辑处理.  动画处理. 生命周期组件. dialog处理.
 
 数据填充(async). loading
+
+<style name="activityAnimateStyle" parent="@android:style/Animation.Activity">
+
+        <!-- 新Activity 进入 -->
+        <item name="android:activityOpenEnterAnimation">@anim/ac_fade_in</item>
+        <!-- 旧Activity退出 -->
+        <item name="android:activityOpenExitAnimation">@anim/ac_fade_out</item>
+        <!-- 新Activity退出 -->
+        <item name="android:activityCloseExitAnimation">@anim/ac_fade_out</item>
+        <!-- 旧Activity进入 -->
+        <item name="android:activityCloseEnterAnimation">@anim/ac_fade_in</item>
+    </style>
+
+
+
+
+
+
+课程表。 月日期变窄
+新题型1 圆角值
+
+G:\android\android-ndk-r12b-windows-x86_64\android-ndk-r12b\toolchains\aarch64-linux-android-4.9\prebuilt\windows-x86_64\bin\aarch64-linux-android-addr2line.exe
+
+
+
+jenkins执行命令要用%
+E:\study\python\python.exe E:/Jenkins_cache/workspace/Self-manage/Self-management/build-script/test.py
+E:\study\python\python.exe %workspace%/Self-management/build-script/test.py
+
+
+
+
