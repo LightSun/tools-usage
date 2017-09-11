@@ -1,0 +1,7 @@
+
+1, webview:
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+      }
+
+2, chrome  ä¯ÀÀÆ÷£ºchrome://inspect/#devices
