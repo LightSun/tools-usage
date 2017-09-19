@@ -1,0 +1,44 @@
+total period: 15260938042
+
+dso /system/lib64/libc.so: accumulated_period: 100.000000%, period: 91.360738%
+dso /data/app/com.example.simpleperf.simpleperfexamplewithnative-1/lib/arm64/libnative-lib.so: accumulated_period: 99.995192%, period: 8.635113%
+dso /system/lib64/libutils.so: accumulated_period: 0.004682%, period: 0.001100%
+dso /system/lib64/libEGL.so: accumulated_period: 0.003601%, period: 0.002908%
+dso /system/lib64/libc++.so: accumulated_period: 0.000234%, period: 0.000016%
+dso /system/lib64/libcutils.so: accumulated_period: 0.000190%, period: 0.000000%
+dso [kernel.kallsyms]: accumulated_period: 0.000126%, period: 0.000126%
+
+file sfp-exceptions.c: accumulated_period: 100.000000%, period: 81.074124%
+file E:\study\simpleperf\demo\SimpleperfExampleWithNative\app\src\main\cpp/native-lib.cpp: accumulated_period: 99.995192%, period: 5.305091%
+
+
+sfp-exceptions.c: accumulated_period: 100.000000%, period: 81.074124%
+	function (__start_thread): line 0, accumulated_period: 99.999874%, period: 0.000000%
+	function (__pthread_start(void*)): line 0, accumulated_period: 99.999874%, period: 0.000000%
+	function (atoi): line 0, accumulated_period: 87.958736%, period: 8.543129%
+	function (strtoq): line 0, accumulated_period: 79.400413%, period: 58.883426%
+	function (isspace): line 0, accumulated_period: 6.942540%, period: 6.942540%
+	function (isalpha): line 0, accumulated_period: 6.704370%, period: 6.704370%
+	function (memcpy): line 0, accumulated_period: 0.000240%, period: 0.000240%
+	function (je_malloc): line 0, accumulated_period: 0.000194%, period: 0.000000%
+	function (__system_property_get): line 0, accumulated_period: 0.000190%, period: 0.000000%
+	function (__system_property_find): line 0, accumulated_period: 0.000190%, period: 0.000190%
+	function (je_tcache_get_hard): line 0, accumulated_period: 0.000170%, period: 0.000034%
+	function (je_tcache_create): line 0, accumulated_period: 0.000135%, period: 0.000053%
+	function (arena_run_tree_remove): line 0, accumulated_period: 0.000126%, period: 0.000000%
+	function (memset): line 0, accumulated_period: 0.000082%, period: 0.000082%
+	function (je_arena_malloc_hard): line 0, accumulated_period: 0.000082%, period: 0.000000%
+	function (malloc): line 0, accumulated_period: 0.000025%, period: 0.000025%
+	function (pthread_getspecific): line 0, accumulated_period: 0.000024%, period: 0.000024%
+	function (open64): line 0, accumulated_period: 0.000010%, period: 0.000010%
+	function (sleep): line 0, accumulated_period: 0.000000%, period: 0.000000%
+	function (pthread_mutex_lock): line 0, accumulated_period: 0.000000%, period: 0.000000%
+	function (nanosleep): line 0, accumulated_period: 0.000000%, period: 0.000000%
+
+
+
+E:\study\simpleperf\demo\SimpleperfExampleWithNative\app\src\main\cpp/native-lib.cpp: accumulated_period: 99.995192%, period: 5.305091%
+	function (BusyLoopThread(void*)): line 43, accumulated_period: 99.995192%, period: 5.305091%
+
+	line 40: accumulated_period: 97.285605%, period: 2.595503%
+	line 46: accumulated_period: 99.995192%, period: 5.305091%
