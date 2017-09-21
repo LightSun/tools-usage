@@ -1,0 +1,1 @@
+compile 'com.headius:invokebinder:1.9'
