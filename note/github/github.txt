@@ -2,5 +2,7 @@
 查看ranking(star or etc.):  https://github-ranking.com/
 自己star 过的项目： https://github.com/stars
 
+项目被哪些人star了： https://github.com/LightSun/data-mediator/stargazers （修改用户和项目名就可以了）
+
 新项目查看
 http://www.open-open.com/github/view/github2016-08-15.html
