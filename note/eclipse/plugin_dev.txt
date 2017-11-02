@@ -1,0 +1,11 @@
+eclipse插件开发 文档
+http://blog.csdn.net/column/details/eclipse-plugin.html
+http://www.vogella.com/tutorials/eclipse.html
+官方 eclipse文档
+http://help.eclipse.org/kepler/index.jsp?topic=/org.eclipse.platform.doc.isv/reference/api/org/eclipse/jface/viewers/IStructuredContentProvider.html
+
+https://help.eclipse.org/mars/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Fguide%2Fworkbench_cmd_menus.htm
+http://www.eclipse.org/articles/viewArticle/ViewArticle2.html
+
+百度资源搜索
+http://www.57fx.com/search/
