@@ -1,1 +1,5 @@
 http://blog.csdn.net/tencent_bugly/article/details/66970015
+
+
+google官方优化文档
+https://source.android.com/devices/tech/perf/low-ram
