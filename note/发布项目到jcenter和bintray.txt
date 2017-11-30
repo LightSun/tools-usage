@@ -1,0 +1,7 @@
+
+发布项目到jcenter和maven
+http://www.jianshu.com/p/3c63ae866e52
+
+
+gpg -a --export donshine723@gmail.com > public_key_sender.asc
+gpg -a --export-secret-key donshine723@gmail.com > private_key_sender.asc
