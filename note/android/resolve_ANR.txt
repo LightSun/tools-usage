@@ -1,0 +1,16 @@
+http://www.cnblogs.com/purediy/p/3225060.html
+
+
+除了看LOG，解决ANR还得需要trace.txt文件，
+
+如何获取呢？可以用如下命令获取
+
+$chmod 777 /data/anr
+
+$rm /data/anr/traces.txt
+
+$ps
+
+$kill -3 PID
+
+adbpull data/anr/traces.txt ./mytraces.txt 

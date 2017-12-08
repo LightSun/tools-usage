@@ -1,0 +1,3 @@
+
+
+AndroidDebugBridge。createBridge

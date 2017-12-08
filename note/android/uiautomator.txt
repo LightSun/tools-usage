@@ -1,0 +1,61 @@
+   本文主要讲解使用UiAutomator的一些技巧，希望对于初学者有一定的帮助
+UiObject
+1、首先要声明对象
+UiObject XXX = new UiObject(new Selector) ;
+
+2、其次对对象进行操作
+操作类型包括：
+执行类：文本输入与清除、点击/长按、拖动/滑动、
+属性类：文本内容、获取子类、是否存在、是否可用
+点击 
+click ()：点击对象
+clickAndWaitForNewWindow (long timeout)：点击对象，等待新窗口出现，参数为等待超时时长，
+clickAndWaitForNewWindow ()：点击对象，等待新窗口出现
+clickBottomRight ()：点击对象的右下角
+clickTopLeft ()：点击对象的左上角
+长按
+longClick ()：长按对象
+longClickBottomRight ()：长按对象右下角
+longClickTopLeft ()：长按对象左上角
+拖拽
+dragTo (UiObject destObj, int steps)：拖拽对象到另一个对象位置上面，可以设置拖动的速度，默认40 steps
+dragTo (int destX, int destY, int steps)：拖拽对象到某个坐标位置，步长可以设置，默认40 steps
+滑动
+swipeDown (int steps)：拖动对象向下滑动，步长可以设置
+swipeLeft (int steps)：拖动对象向左滑动，步长可以设置
+swipeRight (int steps)：拖动对象向右滑动，步长可以设置
+swipeUp (int steps)：拖动对象向上滑动，步长可以设置
+输入/清楚文本
+setText (String text)：设置文本框对象的文本内容
+clearTextField ()：清除文本框对象的文本内容
+获取对象属性
+getBounds ()：获取对象的矩形坐标，即矩形左上角和右下角坐标
+getChild (UiSelector selector)：获取对象的子对象，可以根据子对象的特殊属性来获取
+getChildCount ()：获取下一级子类的数量
+getClassName ()：获取对象的类名
+getContentDescription ()：获取对象的文本描述
+getFromParent (UiSelector selector)：从父类获取子类，根据子类的特殊属性来获取
+getPackageName ()：获取对象的包名
+UiSelector getSelector ()：获取selector，用于调试，实用性不大
+getText ()：获取对象的文本信息
+getVisibleBounds ()：返回可见视图的范围
+属性判断
+isCheckable ()：检查对象的Check属性是否为true，判断当前对象是否可以打钩
+isChecked ()：检查对象的Checked属性是否为true，判断当前对象是否已经打钩
+isClickable ()：检查对象的Click属性是否为true，判断当前对象是否可以点击
+isEnabled ()：检查对象的Enable属性是否为true，判断当前对象是否可用
+isFocusable ()：检查对象的Focusable属性是否为true，判断当前对象是都可以获取焦点
+isFocused ()：检查对象的Focus属性是否为true，判断当前对象是否已经获取焦点
+isLongClickable ()：检查对象的LongClick属性是否为true，判断当前对象是都可以长按
+isScrollable ()：检查对象的LongClick属性是否为true，判断当前对象是都可以滑动
+isSelected ()：检查对象的Selected属性是否为true，判断当前对象是都已经选中
+手势操作
+performMultiPointerGesture (PointerCoords... touches)：执行单手指触控手势，可定义任何手势和形状
+performTwoPointerGesture (Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps)：执行任意两个手指触控，模拟两个手指手势
+pinchIn (int percent, int steps)：手指操作，两点向内收缩
+pinchOut (int percent, int steps)：手指操作，两点向外扩展
+对象是否存在
+waitForExists (long timeout)：等待对象出现， 可设置时长
+waitUntilGone (long timeout)：等待对象消失， 可设置时长
+exists ()：判断对象是否存在
+
