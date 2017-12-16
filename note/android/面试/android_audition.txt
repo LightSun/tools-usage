@@ -1,0 +1,126 @@
+
+1, 手写算法题
+2, activity的启动模式. stand, single task(onNewIntent), single top(onNewIntent), single instance
+3, handler, looper(threadlocal)
+4, 多线程. Thread. HandlerThread,AsyncTask, Thread poll, intentService.
+
+5,anr (5秒没有响应输入，10秒receiver没有处理完，20秒service没有处理完)
+分析log +trace文件
+
+6, view and viewGroup
+
+7,事件处理
+
+8,gc算法。标记清除，复制，分代收集.
+
+9, 四种引用： 强，软，若，虚
+
+10,动画， view动画，属性动画，帧动画。
+
+11,dalvik 和 art
+
+dalvik 在每次运行时通过just-in-time转化为机器码。基于寄存器
+art只在第一次安装时，生成机器码. 基于栈
+
+art优点： 性能显著提升，
+          启动更快,运行更快，体验好，
+          更长的电池续航
+          支持更低的硬件
+缺点：机器码占用的存储空间更大(可能是10%-20%) 
+      app安装时间略长
+
+
+
+===================== 第二面 ==================================
+
+okhttp原理.
+   调用时： header/body/url, Request, Response, Call(execute)
+   内部： RealCall, RequestDispatcher(线程池),
+      interceptor (BridgeInterceptor, CacheInterceptor,ConnectInterceptor) 
+
+   RetryAndFollowUpInterceptor  失败和重定向相关处理
+   BridgeInterceptor:     请求头header, cookie, gzip 等处理
+   CacheInterceptor :     处理缓存。
+   ConnectInterceptor:    打开和服务器的连接, StreamAllocation
+   CallServerInterceptor: 真正和服务器交换数据  
+   //外部也可以注册拦截器
+
+retrofit (代理)
+butterknife
+anr
+
+jvm内存模型， 调优
+    在java中所有的实例域，静态域和数组元素存在堆内存中,堆内存在线程之间共享。
+    局部变量，方法参数，异常处理参数不会在线程之间共享。 他们不存在内存可见性问题，不受堆内存影响
+    
+   java线程之间的通信由java内存模型(JMM)控制：
+         线程之间的共享变量存储在主内存中，每个线程都有自己的本地内存(JMM)。本地内存不真实存在
+    只是JMM抽象的一个概念，它涵盖了缓存，写缓冲区，寄存器以及其他的硬件和编译器优化.
+
+ 并发：   可见性，有序性，原子性     
+         伪共享
+
+    
+垃圾回收算法
+
+http/https
+https加密传输，端口443 (http80),需要CA证书
+
+加密算法: 
+   md5,sha1,base64,aes,des, rsa
+对称算法：秘钥相同需要在网络传输，安全不高
+非对称：公钥和私钥，私钥不在网络传输。安全高
+
+------------------------------------------------------------------
+9, tcp三次握手：
+
+3次： 喂， 你听得到我说话么？
+      我听到了，你听得到我说话么？
+      听到了，我们开始聊吧。
+
+2次：喂，你听得到我说话么？
+     我听到了。
+     喂喂，你听得到我说话么？
+     草，我听得到啊。。。
+     你TMD能不能跟我讲话。
+
+4次：喂，你听得到我说话么？
+     我听到了， 你听得到我说话么？
+     听到了，你能听到我说话么？
+     不想跟SB说话...
+
+核心思想： 既要保证可靠传输，又要保证传输效率，3次握手是最佳选择
+----------------------------------------------------------------------
+10, 内存优化
+     ---bitmap----
+     内存泄漏:  
+     造成现象：  1, 程序卡顿 
+                 2，莫名消失。内存占用太大，在后台时被干掉。
+                 3, oom 崩溃 
+      meminfo . ActivityManager/getMemoryClass, mat/as工具
+
+    计算内存，
+       减少资源（png优化）,
+          对象的重复利用(比如message.TypeArray), 
+              回收， 
+                 检查设计不合理的地方(code review)---- 引用优化,, 枚举
+  
+
+11, 看过哪些源码
+    jdk, android sdk,  rxjava, butterknife, google-databinding,ddmlib
+
+12，棘手问题怎么解决
+    查资料，看源码。 提问。stackoverflow, issue
+
+13, 如何学习， 怎么学习。
+    搜索主题, 实践，看源码。跟随大神(jkxxx)的脚步
+
+ 
+
+
+
+
+
+
+
+
