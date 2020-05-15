@@ -18,7 +18,7 @@ public final class Apktools {
     private static final String REPLACE_FILE_PATH        = "replaceFilePath";
     private static final String FINAL_OUT_TEMPLATE_PATH  = "finalOutTemplatePath";
 
-    private static final String PROJECT_DIR = "projectDir";
+    /*private*/ static final String PROJECT_DIR = "projectDir";
     private static final String APK_OUT_DIR = "apkOutDir";
     private static final String APK_PREFIX  = "apkPrefix";
     private static final String RELEASE     = "release";
@@ -35,10 +35,10 @@ public final class Apktools {
             GEN_APK
     );
 
-    /*public*/ static void execute(Map<String, String> map){
+    /*public*/ static String execute(Map<String, String> map){
         for (String key : KEYS){
             if(!verifyParam(map, key)){
-                 return;
+                 return null;
             }
         }
         List<String> values = VisitServices.from(map).sort(new Comparator<String>() {
@@ -55,7 +55,7 @@ public final class Apktools {
             }
         }).getAsList();
 
-        main(values.toArray(new String[values.size()]));
+        return executeImpl(values.toArray(new String[values.size()]));
     }
     private static boolean verifyParam(Map<String, String> map, String key){
         String s1 = map.get(key);
@@ -67,6 +67,9 @@ public final class Apktools {
     }
 
     public static void main(String[] args) {
+        executeImpl(args);
+    }
+    private static String executeImpl(String[] args) {
         try {
             String templateFilePath = args[0];
             String replaceFilePath = args[1];
@@ -74,11 +77,11 @@ public final class Apktools {
             //gen config file.
             ConfigFileGenerator generator = new ConfigFileGenerator(templateFilePath, replaceFilePath, finalOutTemplatePath);
             if(!generator.generate()){
-                return;
+                return null;
             }
         }catch (Exception e){
             logParamError();
-            return;
+            return null;
         }
 
         String projectDir;
@@ -95,10 +98,10 @@ public final class Apktools {
             genApk = Boolean.parseBoolean(args[7]);
         }catch (Exception e){
             logParamError();
-            return;
+            return null;
         }
         if(!genApk){
-            return;
+            return null;
         }
         //cd to projectDir
     /*    String drive = getDrive(projectDir);
@@ -117,17 +120,17 @@ public final class Apktools {
         cleanHelper.setWorkDir(projectDir);
         System.out.println(" >>> start execute cmd " + cleanHelper.getCmdActually());
         if(!cleanHelper.execute(new CmdHelper.InhertIoCallback())){
-            return;
+            return null;
         }
         System.out.println("clean success. project = " + projectDir);
         //build apk
         String[] cmds = release ? new String[]{projectDir + "/gradlew.bat", "assembleRelease"}
-            : new String[]{projectDir + "/gradlew.bat", "assembleDebug"};
+                : new String[]{projectDir + "/gradlew.bat", "assembleDebug"};
         CmdHelper cmd = new CmdHelper(cmds);
         cmd.setWorkDir(projectDir);
         System.out.println(" >>> start execute cmd: " + cmd.getCmdActually());
         if(!cmd.execute(new CmdHelper.InhertIoCallback())){
-            return;
+            return null;
         }
         System.out.println("build apk finished , start copy apk.");
 
@@ -140,6 +143,7 @@ public final class Apktools {
         }
         FileUtils.copyFile(new File(inputFile), outFile);
         System.out.println("copy apk finished. path = " + outFile.getAbsolutePath());
+        return outFile.getAbsolutePath();
     }
 
     private static String getDrive(String projectDir) {
