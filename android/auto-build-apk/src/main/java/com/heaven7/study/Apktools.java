@@ -113,11 +113,11 @@ public final class Apktools {
         boolean genApk ;
 
         try {
-            projectDir = args[3];
-            apkOutDir = args[4];
-            apkPrefix = args[5];
-            release = Boolean.parseBoolean(args[6]);
-            genApk = Boolean.parseBoolean(args[7]);
+            projectDir = args[4];
+            apkOutDir = args[5];
+            apkPrefix = args[6];
+            release = Boolean.parseBoolean(args[7]);
+            genApk = Boolean.parseBoolean(args[8]);
         }catch (Exception e){
             logParamError();
             return null;
