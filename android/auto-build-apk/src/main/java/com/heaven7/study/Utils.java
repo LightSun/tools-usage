@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /*public*/ class Utils {
 

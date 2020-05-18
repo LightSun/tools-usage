@@ -17,7 +17,7 @@ public final class CurlUploader {
     public static final String KEY_API_KEY  = "apiKey";
 
     //opt
-    public static final String KEY_INSTALL_TYPE  = "installType"; //1,2,3)。1：open，2：pwd，3：invitor。 default 1
+    public static final String KEY_INSTALL_TYPE  = "installType"; //1,2,3). 1：open. 2：pwd. 3：invitor. default 1
     public static final String KEY_PASSWORD  = "password";
     public static final String KEY_UPDATE_DESC  = "updateDescription";
     public static final String KEY_CHANNEL  = "channelShortcut";

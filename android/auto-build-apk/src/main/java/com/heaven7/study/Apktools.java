@@ -2,6 +2,7 @@ package com.heaven7.study;
 
 import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.TextUtils;
+import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.MapResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
@@ -36,6 +37,14 @@ public final class Apktools {
     );
 
     /*public*/ static String execute(Map<String, String> map){
+        //filter a={$b}
+       /* VisitServices.from(map).fire(new MapFireVisitor<String, String>() {
+            @Override
+            public Boolean visit(KeyValuePair<String, String> pair, Object param) {
+                return null;
+            }
+        });*/
+
         for (String key : KEYS){
             if(!verifyParam(map, key)){
                  return null;
