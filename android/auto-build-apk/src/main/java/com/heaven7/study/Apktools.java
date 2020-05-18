@@ -15,6 +15,7 @@ import java.util.List;
 
 public final class Apktools {
 
+    private static final String IGNORE_TEMPLATE          = "ignoreTemplate";
     private static final String TEMPLATE_FILE_PATH       = "templateFilePath";
     private static final String REPLACE_FILE_PATH        = "replaceFilePath";
     private static final String FINAL_OUT_TEMPLATE_PATH  = "finalOutTemplatePath";
@@ -26,9 +27,11 @@ public final class Apktools {
     private static final String GEN_APK     = "genApk";
 
     private static final List<String> KEYS = Arrays.asList(
+            IGNORE_TEMPLATE,
             TEMPLATE_FILE_PATH,
             REPLACE_FILE_PATH,
             FINAL_OUT_TEMPLATE_PATH,
+
             PROJECT_DIR,
             APK_OUT_DIR,
             APK_PREFIX,
@@ -80,13 +83,17 @@ public final class Apktools {
     }
     private static String executeImpl(String[] args) {
         try {
-            String templateFilePath = args[0];
-            String replaceFilePath = args[1];
-            String finalOutTemplatePath = args[2];
-            //gen config file.
-            ConfigFileGenerator generator = new ConfigFileGenerator(templateFilePath, replaceFilePath, finalOutTemplatePath);
-            if(!generator.generate()){
-                return null;
+            String ignoreTemplate = args[0];
+            //if ignore template. just build direct
+            if(!Boolean.parseBoolean(ignoreTemplate)){
+                String templateFilePath = args[1];
+                String replaceFilePath = args[2];
+                String finalOutTemplatePath = args[3];
+                //gen config file.
+                ConfigFileGenerator generator = new ConfigFileGenerator(templateFilePath, replaceFilePath, finalOutTemplatePath);
+                if(!generator.generate()){
+                    return null;
+                }
             }
         }catch (Exception e){
             logParamError();
