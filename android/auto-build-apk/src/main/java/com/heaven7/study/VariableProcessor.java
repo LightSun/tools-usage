@@ -1,7 +1,9 @@
 package com.heaven7.study;
 
+import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.MapPredicateVisitor;
+import com.heaven7.java.visitor.MapResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
@@ -9,6 +11,7 @@ import com.heaven7.java.visitor.util.Map2Map;
 import com.heaven7.java.visitor.util.Predicates;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,25 +32,30 @@ import java.util.regex.Pattern;
     /** null means failed */
     public Map<String, String> process(){
         final AtomicBoolean mSuccess = new AtomicBoolean(true);
-        HashMap<String, String> outMap = new HashMap<>(in.toNormalMap());
-        VisitServices.from(in).fire(new MapFireVisitor<String, String>() {
+
+        final HashMap<String, String> outMap = new HashMap<>(in.toNormalMap());
+
+        List<PairInfo> infos = VisitServices.from(in).map(new MapResultVisitor<String, String, PairInfo>() {
             @Override
-            public Boolean visit(KeyValuePair<String, String> pair, Object param) {
-                String value = pair.getValue();
-                List<Item> items = findVars(value);
-                if(!Predicates.isEmpty(items)){
-                    for (Item item : items){
-                        String s = in.get(item.getKeyword());
-                        if(s == null){
-                            mSuccess.compareAndSet(true, false);
-                            System.err.println("can't resolve variable '" + item.text + "'!");
-                        }else {
-                            value = value.replace(item.text, s);
-                        }
-                    }
-                    //override
-                    outMap.put(pair.getKey(), value);
+            public PairInfo visit(KeyValuePair<String, String> pair, Object param) {
+                List<Item> items = findVars(pair.getValue());
+                PairInfo info = new PairInfo(pair, items);
+                if (!Predicates.isEmpty(items)) {
+                    computeDepth(info, items, 0);
                 }
+                return info;
+            }
+        }).getAsList();
+        //sort with depth
+        VisitServices.from(infos).sortService(new Comparator<PairInfo>() {
+            @Override
+            public int compare(PairInfo o1, PairInfo o2) {
+                return Integer.compare(o1.variableDepth, o2.variableDepth);
+            }
+        }).fire(new FireVisitor<PairInfo>() {
+            @Override
+            public Boolean visit(PairInfo info, Object param) {
+                getMappedText(info.pair.getKey(), info.pair.getValue(), info.items, mSuccess, outMap);
                 return null;
             }
         });
@@ -55,6 +63,41 @@ import java.util.regex.Pattern;
             return null;
         }
         return new Map2Map<>(outMap);
+    }
+    private void getMappedText(String key, String value, List<Item> items, AtomicBoolean resultState, HashMap<String, String> outMap){
+        for (Item item : items){
+            //if previous is mapped, use directly.
+            String s = outMap.get(item.getKeyword());
+            if(s == null){
+                s = in.get(item.getKeyword());
+            }
+            if(s == null){
+                resultState.compareAndSet(true, false);
+                System.err.println("can't resolve variable '" + item.text + "'!");
+            }else {
+                //s = {$a}/x
+                List<Item> childItems = findVars(s);
+                if(Predicates.isEmpty(childItems)){
+                    value = value.replace(item.text, s);
+                    //override
+                    outMap.put(key, value);
+                }else {
+                    getMappedText(item.getKeyword(), s, childItems, resultState, outMap);
+                }
+            }
+        }
+    }
+
+    private void computeDepth(PairInfo info, List<Item> items, int current) {
+        for (Item item : items){
+            String s = in.get(item.getKeyword());
+            if(info.variableDepth <= current){
+                info.variableDepth ++;
+            }
+            if(s != null){
+                computeDepth(info, findVars(s), current + 1);
+            }
+        }
     }
 
     private static List<Item> findVars(String value) {
@@ -77,7 +120,7 @@ import java.util.regex.Pattern;
         return items;
     }
 
-    public static class Item{
+    private static class Item{
 
         public final int start;
         public final int end;
@@ -94,5 +137,14 @@ import java.util.regex.Pattern;
             return text.substring(2, text.length()-1);
         }
     }
+    private static class PairInfo{
+        final KeyValuePair<String, String> pair;
+        final List<Item> items;
+        int variableDepth; //variable depth
 
+        public PairInfo(KeyValuePair<String, String> pair, List<Item> items) {
+            this.pair = pair;
+            this.items = items;
+        }
+    }
 }
