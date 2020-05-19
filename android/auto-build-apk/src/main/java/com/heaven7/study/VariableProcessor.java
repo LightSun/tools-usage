@@ -1,8 +1,6 @@
 package com.heaven7.study;
 
 import com.heaven7.java.visitor.FireVisitor;
-import com.heaven7.java.visitor.MapFireVisitor;
-import com.heaven7.java.visitor.MapPredicateVisitor;
 import com.heaven7.java.visitor.MapResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;

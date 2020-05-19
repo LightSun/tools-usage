@@ -2,18 +2,15 @@ package com.heaven7.study;
 
 import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.TextUtils;
-import com.heaven7.java.visitor.MapFireVisitor;
 import com.heaven7.java.visitor.MapPredicateVisitor;
 import com.heaven7.java.visitor.MapResultVisitor;
 import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
-import com.heaven7.java.visitor.util.Map2Map;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 public final class Apktools {
