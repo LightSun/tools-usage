@@ -25,6 +25,7 @@ public final class Apktools {
     private static final String APK_PREFIX  = "apkPrefix";
     private static final String RELEASE     = "release";
     private static final String GEN_APK     = "genApk";
+    private static final String PROXY       = "proxy";
 
     private static final List<String> KEYS = Arrays.asList(
             IGNORE_TEMPLATE,
@@ -36,7 +37,8 @@ public final class Apktools {
             APK_OUT_DIR,
             APK_PREFIX,
             RELEASE,
-            GEN_APK
+            GEN_APK,
+            PROXY
     );
 
     /*public*/ static String execute(Map<String, String> map){
@@ -108,6 +110,7 @@ public final class Apktools {
         String apkPrefix ;
         boolean release ;
         boolean genApk ;
+        String proxy = null;
 
         try {
             projectDir = args[4];
@@ -115,6 +118,9 @@ public final class Apktools {
             apkPrefix = args[6];
             release = Boolean.parseBoolean(args[7]);
             genApk = Boolean.parseBoolean(args[8]);
+            if(args.length >= 10){
+                proxy = args[9];
+            }
         }catch (Exception e){
             logParamError();
             return null;
@@ -143,6 +149,16 @@ public final class Apktools {
         }
         System.out.println("clean success. project = " + projectDir);
         //build apk
+        /*if(proxy != null && proxy.length() > 0){
+            String[] cmds = new CmdBuilder()
+                    .cmd("cmd set http_proxy=http://" + proxy).success()
+                    .cmd("set https_proxy=http://" + proxy)
+                    .toCmd();
+
+            CmdHelper cmd = new CmdHelper(cmds);
+            cmd.setWorkDir(projectDir);
+            System.out.println(" proxy >>> start execute cmd: " + cmd.getCmdActually());
+        }*/
         String[] cmds = release ? new String[]{projectDir + "/gradlew.bat", "assembleRelease"}
                 : new String[]{projectDir + "/gradlew.bat", "assembleDebug"};
         CmdHelper cmd = new CmdHelper(cmds);
