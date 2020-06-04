@@ -37,8 +37,7 @@ public final class Apktools {
             APK_OUT_DIR,
             APK_PREFIX,
             RELEASE,
-            GEN_APK,
-            PROXY
+            GEN_APK
     );
 
     /*public*/ static String execute(Map<String, String> map){
