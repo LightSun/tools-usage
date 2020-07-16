@@ -4,10 +4,13 @@ import com.heaven7.java.base.util.DefaultPrinter;
 import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.IterateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.IterationInfo;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 //like: mingw
 public final class GccCompiles {
@@ -55,58 +58,65 @@ public final class GccCompiles {
         return sourceFilePres;
     }
 
-    public void compileExecutable(String name){
-        preProcess();
-        compile();
-        asm();
-        linkExecutable(name);
+    public boolean compileExecutable(String name){
+        if(!preProcess()){
+            return false;
+        }
+        if(!compile()){
+            return false;
+        }
+        if(!asm()){
+            return false;
+        }
+        return linkExecutable(name);
     }
     //compile steps: preProcess, compile, asm,link
-    private void preProcess(){
+    private boolean preProcess(){
         final List<String> pres = getSourcePathPrefix();
-        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
-            @Override
-            public Void visit(Object param, String s, int index, int size) {
-                String[] strs = new CmdBuilder().str(getToolName())
-                        .str("-E").str(s).str("-o").str(pres.get(index) +".i")
-                        .toCmd();
-                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
-                DefaultPrinter.getDefault().debug(TAG, "preProcess", "result = " + result);
-                return null;
+        for (int i = 0 , size  = sourceFiles.size() ; i < size ; i ++){
+            String s = sourceFiles.get(i);
+            String[] strs = new CmdBuilder().str(getToolName())
+                    .str("-E").str(s).str("-o").str(pres.get(i) + ".i")
+                    .toCmd();
+            boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+            DefaultPrinter.getDefault().debug(TAG, "preProcess", "result = " + result);
+            if(!result){
+                return false;
             }
-        });
+        }
+        return true;
     }
-    private void compile(){
+    private boolean compile(){
         final List<String> pres = getSourcePathPrefix();
-        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
-            @Override
-            public Void visit(Object param, String s, int index, int size) {
-                String pre = pres.get(index);
-                String[] strs = new CmdBuilder().str(getToolName())
-                        .str("-S").str(pre + ".i").str("-o").str(pre +".s")
-                        .toCmd();
-                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
-                DefaultPrinter.getDefault().debug(TAG, "compile", "result = " + result);
-                return null;
+        for (int i = 0 , size  = sourceFiles.size() ; i < size ; i ++) {
+            String pre = pres.get(i);
+            String[] strs = new CmdBuilder().str(getToolName())
+                    .str("-S").str(pre + ".i").str("-o").str(pre +".s")
+                    .toCmd();
+            boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+            DefaultPrinter.getDefault().debug(TAG, "compile", "result = " + result);
+            if(!result){
+                return false;
             }
-        });
+        }
+        return true;
     }
-    private void asm(){
+    private boolean asm(){
         final List<String> pres = getSourcePathPrefix();
-        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
-            @Override
-            public Void visit(Object param, String s, int index, int size) {
-                String pre = pres.get(index);
-                String[] strs = new CmdBuilder().str(getToolName())
-                        .str("-c").str(pre + ".s").str("-o").str(pre +".o")
-                        .toCmd();
-                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
-                DefaultPrinter.getDefault().debug(TAG, "asm", "result = " + result);
-                return null;
+        for (int i = 0 , size  = sourceFiles.size() ; i < size ; i ++) {
+            String pre = pres.get(i);
+            String[] strs = new CmdBuilder().str(getToolName())
+                    .str("-c").str(pre + ".s").str("-o").str(pre +".o")
+                    .toCmd();
+            boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+            DefaultPrinter.getDefault().debug(TAG, "asm", "result = " + result);
+            if(!result){
+                return false;
             }
-        });
+        }
+        return true;
     }
-    private void linkExecutable(String name){
+    private boolean linkExecutable(String name){
         final List<String> pres = getSourcePathPrefix();
         final CmdBuilder cmdBuilder = new CmdBuilder().str(getToolName());
         VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
@@ -126,6 +136,7 @@ public final class GccCompiles {
 
         boolean result = new CmdHelper(cmdBuilder.toCmd()).execute(new CmdHelper.InhertIoCallback());
         DefaultPrinter.getDefault().debug(TAG, "linkExecutable", "result = " + result);
+        return result;
     }
     private String getToolName(){
         return useCpp ? "g++" : "gcc";
