@@ -1,0 +1,41 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://repo.spring.io/libs-release" }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "us.kirchmeier:gradle-capsule-plugin:1.0.2"
+    }
+}
+
+
+plugins {
+    id 'java'
+    id "us.kirchmeier.capsule" version "1.0.2"
+}
+
+apply plugin: "us.kirchmeier.capsule"
+
+group 'com.heaven7.tool.gcc'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url "https://repo.spring.io/libs-release" }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile 'com.heaven7.java.base:Java-base:1.2.0'
+    compile 'com.heaven7.java.visitor:Visitor:1.3.5'
+}

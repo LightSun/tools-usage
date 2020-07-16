@@ -1,0 +1,133 @@
+package com.heaven7.tool.gcc;
+
+import com.heaven7.java.base.util.DefaultPrinter;
+import com.heaven7.java.base.util.FileUtils;
+import com.heaven7.java.base.util.TextUtils;
+import com.heaven7.java.visitor.FireIndexedVisitor;
+import com.heaven7.java.visitor.ResultVisitor;
+import com.heaven7.java.visitor.collection.VisitServices;
+
+import java.util.List;
+
+//like: mingw
+public final class GccCompiles {
+
+    private static final String TAG = "GccCompiles";
+    private boolean useCpp;
+    private List<String> sourceFiles;
+    private List<String> sourceFilePres;
+
+    private String outDir;
+
+    public GccCompiles(boolean useCpp, List<String> sourceFiles) {
+        this.useCpp = useCpp;
+        this.sourceFiles = sourceFiles;
+    }
+
+    public GccCompiles(boolean useCpp, final String dir, List<String> sourceFiles) {
+        this.useCpp = useCpp;
+        this.sourceFiles = VisitServices.from(sourceFiles).map(new ResultVisitor<String, String>() {
+            @Override
+            public String visit(String s, Object param) {
+                return dir + "/" +s;
+            }
+        }).getAsList();
+    }
+
+    public String getOutDir() {
+        return outDir;
+    }
+    public void setOutDir(String outDir) {
+        this.outDir = outDir;
+    }
+
+    private List<String> getSourcePathPrefix(){
+        if(sourceFilePres == null){
+            sourceFilePres = VisitServices.from(sourceFiles).map(new ResultVisitor<String, String>() {
+                @Override
+                public String visit(String s, Object param) {
+                    String dir = FileUtils.getFileDir(s, 1, true);
+                    String name = FileUtils.getFileName(s);
+                    return dir + "/" + name;
+                }
+            }).getAsList();
+        }
+        return sourceFilePres;
+    }
+
+    public void compileExecutable(String name){
+        preProcess();
+        compile();
+        asm();
+        linkExecutable(name);
+    }
+    //compile steps: preProcess, compile, asm,link
+    private void preProcess(){
+        final List<String> pres = getSourcePathPrefix();
+        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                String[] strs = new CmdBuilder().str(getToolName())
+                        .str("-E").str(s).str("-o").str(pres.get(index) +".i")
+                        .toCmd();
+                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+                DefaultPrinter.getDefault().debug(TAG, "preProcess", "result = " + result);
+                return null;
+            }
+        });
+    }
+    private void compile(){
+        final List<String> pres = getSourcePathPrefix();
+        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                String pre = pres.get(index);
+                String[] strs = new CmdBuilder().str(getToolName())
+                        .str("-S").str(pre + ".i").str("-o").str(pre +".s")
+                        .toCmd();
+                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+                DefaultPrinter.getDefault().debug(TAG, "compile", "result = " + result);
+                return null;
+            }
+        });
+    }
+    private void asm(){
+        final List<String> pres = getSourcePathPrefix();
+        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                String pre = pres.get(index);
+                String[] strs = new CmdBuilder().str(getToolName())
+                        .str("-c").str(pre + ".s").str("-o").str(pre +".o")
+                        .toCmd();
+                boolean result = new CmdHelper(strs).execute(new CmdHelper.InhertIoCallback());
+                DefaultPrinter.getDefault().debug(TAG, "asm", "result = " + result);
+                return null;
+            }
+        });
+    }
+    private void linkExecutable(String name){
+        final List<String> pres = getSourcePathPrefix();
+        final CmdBuilder cmdBuilder = new CmdBuilder().str(getToolName());
+        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                String pre = pres.get(index);
+                cmdBuilder.str(pre + ".o");
+                return null;
+            }
+        });
+        cmdBuilder.str("-o");
+        if(TextUtils.isEmpty(outDir)){
+            cmdBuilder.str(name + ".exe");
+        }else {
+            cmdBuilder.str(outDir + "/" + name + ".exe");
+        }
+
+        boolean result = new CmdHelper(cmdBuilder.toCmd()).execute(new CmdHelper.InhertIoCallback());
+        DefaultPrinter.getDefault().debug(TAG, "linkExecutable", "result = " + result);
+    }
+    private String getToolName(){
+        return useCpp ? "g++" : "gcc";
+    }
+}
