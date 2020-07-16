@@ -4,13 +4,10 @@ import com.heaven7.java.base.util.DefaultPrinter;
 import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.visitor.FireIndexedVisitor;
-import com.heaven7.java.visitor.IterateVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
-import com.heaven7.java.visitor.collection.IterationInfo;
 import com.heaven7.java.visitor.collection.VisitServices;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 //like: mingw
 public final class GccCompiles {

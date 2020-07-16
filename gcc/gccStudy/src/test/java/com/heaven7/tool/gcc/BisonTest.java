@@ -8,6 +8,8 @@ public final class BisonTest {
     public void test1(){
         String flexFile = "D:\\study\\tools\\GnuWin32\\study/flex.l";
         String bisonFile = "D:\\study\\tools\\GnuWin32\\study/bison.y";
-        new Bison(flexFile, bisonFile).process();
+        Bison bison = new Bison(flexFile, bisonFile);
+        bison.setOutDir("D:\\study\\tools\\GnuWin32\\study");
+        bison.process();
     }
 }
