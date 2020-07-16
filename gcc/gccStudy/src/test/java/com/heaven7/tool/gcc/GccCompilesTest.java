@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public final class GccCompilesTest {
 
+    //gcc main.c syntax.tab.c -lfl -ly -o parser
     public static void main(String[] args) throws Exception {
         String[] files = {
             "lex.yy.c",
