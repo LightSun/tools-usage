@@ -54,6 +54,29 @@ public final class GccCompiles {
         }
         return sourceFilePres;
     }
+    public boolean compileBisonDirectly(String name){
+        final CmdBuilder cmdBuilder = new CmdBuilder().str(getToolName());
+        VisitServices.from(sourceFiles).fireWithIndex(new FireIndexedVisitor<String>() {
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                cmdBuilder.str(s);
+                return null;
+            }
+        });
+        //todo just for bison
+        cmdBuilder
+                //.str("-lfl")
+                //.str("-ly")
+                .str("-o");
+        if(TextUtils.isEmpty(outDir)){
+            cmdBuilder.str(name);
+        }else {
+            cmdBuilder.str(outDir + "/" + name);
+        }
+        boolean result = new CmdHelper(cmdBuilder.toCmd()).execute(new CmdHelper.InhertIoCallback());
+        DefaultPrinter.getDefault().debug(TAG, "compileExecutableDirectly", "result = " + result);
+        return result;
+    }
 
     public boolean compileExecutable(String name){
         if(!preProcess()){
