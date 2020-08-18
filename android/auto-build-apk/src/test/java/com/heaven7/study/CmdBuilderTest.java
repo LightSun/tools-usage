@@ -15,7 +15,7 @@ public class CmdBuilderTest {
         CmdHelper cmd = new CmdHelper(cmds);
         System.out.println(" >>> start execute cmd: " + cmd.getCmdActually());
         if(!cmd.execute(new CmdHelper.InhertIoCallback())){
-            System.err.println(">>> execute faile.");
+            System.err.println(">>> execute failed.");
         }
     }
 }

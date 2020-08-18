@@ -9,8 +9,10 @@ import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.java.visitor.util.Map;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public final class Apktools {
@@ -169,9 +171,10 @@ public final class Apktools {
         System.out.println("build apk finished , start copy apk.");
 
         //copy apk
+        String time = new SimpleDateFormat("yyyy-mm-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
         String inputFile = projectDir +"/app/build/outputs/apk/" +
                 (release ? "release/app-release.apk" :"debug/app-debug.apk");
-        File outFile = new File(apkOutDir, release ? apkPrefix + "__app-release.apk" : apkPrefix + "__app-debug.apk");
+        File outFile = new File(apkOutDir, release ? apkPrefix + "__release" + time +".apk" : apkPrefix + "__debug_" + time + ".apk");
         if(outFile.exists()){
             outFile.delete();
         }
