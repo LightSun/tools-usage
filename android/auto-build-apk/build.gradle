@@ -45,7 +45,7 @@ task build_jar(type: FatCapsule){
     baseName 'Apktools'
 }
 
-//
+//support upload
 task build_jar2(type: FatCapsule){
     applicationClass 'com.heaven7.study.ApkParamTool'
     baseName 'ApkParamTool'

@@ -171,7 +171,7 @@ public final class Apktools {
         System.out.println("build apk finished , start copy apk.");
 
         //copy apk
-        String time = new SimpleDateFormat("yyyy-mm-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
+        String time = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
         String inputFile = projectDir +"/app/build/outputs/apk/" +
                 (release ? "release/app-release.apk" :"debug/app-debug.apk");
         File outFile = new File(apkOutDir, release ? apkPrefix + "__release_" + time +".apk" : apkPrefix + "__debug_" + time + ".apk");
