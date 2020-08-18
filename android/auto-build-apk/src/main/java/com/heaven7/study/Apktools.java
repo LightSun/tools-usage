@@ -174,7 +174,7 @@ public final class Apktools {
         String time = new SimpleDateFormat("yyyy-mm-dd_HH-mm-ss").format(new Date(System.currentTimeMillis()));
         String inputFile = projectDir +"/app/build/outputs/apk/" +
                 (release ? "release/app-release.apk" :"debug/app-debug.apk");
-        File outFile = new File(apkOutDir, release ? apkPrefix + "__release" + time +".apk" : apkPrefix + "__debug_" + time + ".apk");
+        File outFile = new File(apkOutDir, release ? apkPrefix + "__release_" + time +".apk" : apkPrefix + "__debug_" + time + ".apk");
         if(outFile.exists()){
             outFile.delete();
         }
