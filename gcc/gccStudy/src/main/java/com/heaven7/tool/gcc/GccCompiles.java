@@ -16,6 +16,9 @@ public final class GccCompiles {
     private boolean useCpp;
     private List<String> sourceFiles;
     private List<String> sourceFilePres;
+    private String compilerPath;
+    private String cCompilerName;
+    private String cppCompilerName;
 
     private String outDir;
 
@@ -32,6 +35,28 @@ public final class GccCompiles {
                 return dir + "/" +s;
             }
         }).getAsList();
+    }
+
+    public String getCompilerPath() {
+        return compilerPath;
+    }
+    public void setCompilerPath(String path){
+        this.compilerPath = path;
+    }
+    public String getcCompilerName() {
+        return cCompilerName;
+    }
+
+    public void setcCompilerName(String cCompilerName) {
+        this.cCompilerName = cCompilerName;
+    }
+
+    public String getCppCompilerName() {
+        return cppCompilerName;
+    }
+
+    public void setCppCompilerName(String cppCompilerName) {
+        this.cppCompilerName = cppCompilerName;
     }
 
     public String getOutDir() {
@@ -159,6 +184,17 @@ public final class GccCompiles {
         return result;
     }
     private String getToolName(){
+        if(compilerPath != null){
+            if(useCpp){
+                if(cppCompilerName != null){
+                    return compilerPath + "/" + cppCompilerName;
+                }
+            }else {
+                if(cCompilerName != null){
+                    return compilerPath + "/" + cCompilerName;
+                }
+            }
+        }
         return useCpp ? "g++" : "gcc";
     }
 }

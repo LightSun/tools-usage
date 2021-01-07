@@ -1,7 +1,6 @@
 package com.heaven7.tool.gcc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class CmdBuilder {
@@ -12,11 +11,15 @@ public final class CmdBuilder {
         this.mList = new ArrayList<String>();
     }
     public CmdBuilder str(String str){
-        mList.add(str);
+        if(!str.isEmpty()){
+            mList.add(str);
+        }
         return this;
     }
     public CmdBuilder strs(String[] cmd){
-        mList.addAll(Arrays.asList(cmd));
+        for (String c : cmd){
+            str(c);
+        }
         return this;
     }
     public CmdBuilder cmd(String str){
