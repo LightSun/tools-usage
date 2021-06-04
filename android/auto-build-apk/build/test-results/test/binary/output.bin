@@ -1,0 +1,2 @@
+f >>> start execute cmd: cmd set http_proxy=http://127.0.0.1:1080 & https_proxy=http://127.0.0.1:1080
+^cmd set http_proxy=http://127.0.0.1:1080 & https_proxy=http://127.0.0.1:1080  ,exitValue = 0
