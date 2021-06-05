@@ -13,6 +13,7 @@ public final class EmailParams {
 
     public static final String KEY_SENDER_ACC = "sender_acc";
     public static final String KEY_SENDER_PWD = "sender_pwd";
+    public static final String KEY_SENDER_NAME = "sender_name";
     public static final String KEY_RECEIVERS = "receivers";
     public static final String KEY_RECEIVERS_COPY = "receivers_copy";
     public static final String KEY_RECEIVERS_SAFE_COPY = "receivers_safe_copy";
@@ -31,6 +32,7 @@ public final class EmailParams {
 
     private String sender_acc;//need
     private String sender_pwd;//need
+    private String sender_name = "heaven7";
     private List<String> receivers;//need
     private List<String> receivers_copy;
     private List<String> receivers_safe_copy;
@@ -48,20 +50,20 @@ public final class EmailParams {
 
     private final Map<String, String> mExtras = new HashMap<>();
 
-    public void verify(){
-        if(TextUtils.isEmpty(sender_acc)){
+    public void verify() {
+        if (TextUtils.isEmpty(sender_acc)) {
             throw new RuntimeException("must assign sender by 'sender_acc'");
         }
-        if(TextUtils.isEmpty(sender_pwd)){
+        if (TextUtils.isEmpty(sender_pwd)) {
             throw new RuntimeException("must assign sender pwd by 'sender_pwd'");
         }
-        if(Predicates.isEmpty(receivers)){
+        if (Predicates.isEmpty(receivers)) {
             throw new RuntimeException("must assign receivers by 'receivers'");
         }
-        if(Predicates.isEmpty(subject)){
+        if (Predicates.isEmpty(subject)) {
             throw new RuntimeException("must assign subject by 'subject'");
         }
-        if(Predicates.isEmpty(body_text)){
+        if (Predicates.isEmpty(body_text)) {
             throw new RuntimeException("must assign body_text by 'body_text'");
         }
     }
@@ -87,114 +89,133 @@ public final class EmailParams {
         VisitServices.from(lines).fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String s, Object param) {
-                String[] ks = s.split("=");
-                if (ks.length < 2) {
-                    System.err.println("wrong line: " + s);
-                } else {
-                    String key = ks[0];
-                    String value = ks[1];
-                    switch (key) {
-                        case KEY_SENDER_ACC:
-                            obj.setSender_acc(value);
-                            break;
-                        case KEY_SENDER_PWD:
-                            obj.setSender_pwd(value);
-                            break;
-                        case KEY_RECEIVERS:
-                            obj.setReceivers(Arrays.asList(value.split(",")));
-                            break;
-                        case KEY_RECEIVERS_COPY:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setReceivers_copy(Arrays.asList(value.split(",")));
-                            }
-                            break;
-                        case KEY_RECEIVERS_SAFE_COPY:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setReceivers_safe_copy(Arrays.asList(value.split(",")));
-                            }
-                            break;
-                        case KEY_SUBJECT:
-                            obj.setSubject(value);
-                            break;
-                        case KEY_BODY:
-                            obj.setBody_text(value);
-                            break;
-                        case KEY_FILE_DIR:
-                            if(!TextUtils.isEmpty(value)){
-                                List<String> exts = new ArrayList<>();
-                                String dir;
-                                if (value.contains("::")) {
-                                    String[] strs = value.split("::");
-                                    exts.addAll(Arrays.asList(strs[0].split(",")));
-                                    dir = strs[1];
-                                } else {
-                                    dir = value;
-                                }
-                                List<String> files = new ArrayList<>();
-                                FileUtils.getFiles(new File(dir), new FileFilter() {
-                                    @Override
-                                    public boolean accept(File pathname) {
-                                        if(pathname.isDirectory()){
-                                            return false;
-                                        }
-                                        if (exts.isEmpty()) {
-                                            return true;
-                                        }
-                                        String ext = FileUtils.getFileExtension(pathname);
-                                        return ext != null && exts.contains(ext);
-                                    }
-                                }, files);
-                                obj.setFiles(files);
-                            }
-                            break;
-                        case KEY_FILES:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setFiles(Arrays.asList(value.split(",")));
-                            }
-                            break;
-
-                        case KEY_SAVE_FILE:
-                            obj.setSaveFile(value);
-                            break;
-                        case KEY_ENABLE_SSL:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setEnableSsl(Boolean.parseBoolean(value));
-                            }
-                            break;
-
-                        case KEY_SEND_DATE:
-                            if (value.contains("'")) {
-                                int s1 = value.indexOf("'");
-                                int s2 = value.lastIndexOf("'");
-                                String fmt = value.substring(s1, s2 + 1);
-                                try {
-                                    obj.setSendDate(new SimpleDateFormat(fmt).parse(value.substring(s2 + 1)).getTime());
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            break;
-
-                        case KEY_PROTOCOL:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setProtocol(value);
-                            }
-                            break;
-
-                        case KEY_PROTOCOL_HOST:
-                            if(!TextUtils.isEmpty(value)){
-                                obj.setProtocol_host(value);
-                            }
-                            break;
-
-                        default:
-                            obj.getExtras().put(key, value);
-                    }
-                }
+                obj.setIfNeed(s);
                 return null;
             }
         });
         return obj;
+    }
+
+    public void setIfNeed(String s) {
+        final EmailParams obj = this;
+
+        String[] ks = s.split("=");
+        if (ks.length < 2) {
+            System.err.println("wrong line: " + s);
+        } else {
+            String key = ks[0];
+            String value = ks[1];
+            switch (key) {
+                case KEY_SENDER_ACC:
+                    obj.setSender_acc(value);
+                    break;
+                case KEY_SENDER_PWD:
+                    obj.setSender_pwd(value);
+                    break;
+                case KEY_SENDER_NAME:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setSender_name(value);
+                    }
+                    break;
+                case KEY_RECEIVERS:
+                    obj.setReceivers(Arrays.asList(value.split(",")));
+                    break;
+                case KEY_RECEIVERS_COPY:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setReceivers_copy(Arrays.asList(value.split(",")));
+                    }
+                    break;
+                case KEY_RECEIVERS_SAFE_COPY:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setReceivers_safe_copy(Arrays.asList(value.split(",")));
+                    }
+                    break;
+                case KEY_SUBJECT:
+                    obj.setSubject(value);
+                    break;
+                case KEY_BODY:
+                    obj.setBody_text(value);
+                    break;
+                case KEY_FILE_DIR:
+                    if (!TextUtils.isEmpty(value)) {
+                        List<String> exts = new ArrayList<>();
+                        String dir;
+                        if (value.contains("::")) {
+                            String[] strs = value.split("::");
+                            exts.addAll(Arrays.asList(strs[0].split(",")));
+                            dir = strs[1];
+                        } else {
+                            dir = value;
+                        }
+                        List<String> files = new ArrayList<>();
+                        FileUtils.getFiles(new File(dir), new FileFilter() {
+                            @Override
+                            public boolean accept(File pathname) {
+                                if (pathname.isDirectory()) {
+                                    return false;
+                                }
+                                if (exts.isEmpty()) {
+                                    return true;
+                                }
+                                String ext = FileUtils.getFileExtension(pathname);
+                                return ext != null && exts.contains(ext);
+                            }
+                        }, files);
+                        obj.setFiles(files);
+                    }
+                    break;
+                case KEY_FILES:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setFiles(Arrays.asList(value.split(",")));
+                    }
+                    break;
+
+                case KEY_SAVE_FILE:
+                    obj.setSaveFile(value);
+                    break;
+                case KEY_ENABLE_SSL:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setEnableSsl(Boolean.parseBoolean(value));
+                    }
+                    break;
+
+                case KEY_SEND_DATE:
+                    if (value.contains("'")) {
+                        int s1 = value.indexOf("'");
+                        int s2 = value.lastIndexOf("'");
+                        String fmt = value.substring(s1, s2 + 1);
+                        try {
+                            obj.setSendDate(new SimpleDateFormat(fmt).parse(value.substring(s2 + 1)).getTime());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+
+                case KEY_PROTOCOL:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setProtocol(value);
+                    }
+                    break;
+
+                case KEY_PROTOCOL_HOST:
+                    if (!TextUtils.isEmpty(value)) {
+                        obj.setProtocol_host(value);
+                    }
+                    break;
+
+                default:
+                    obj.getExtras().put(key, value);
+            }
+        }
+    }
+
+    public String getSender_name() {
+        return sender_name;
+    }
+
+    public void setSender_name(String sender_name) {
+        this.sender_name = sender_name;
     }
 
     public Map<String, String> getExtras() {

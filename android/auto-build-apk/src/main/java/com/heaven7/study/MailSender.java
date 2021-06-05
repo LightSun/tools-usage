@@ -23,12 +23,25 @@ import java.util.Properties;
 
 public final class MailSender {
 
+    //可以动态指定 发送的文件和或者文件夹
     public static void main(String[] args) {
         if(args.length == 0){
             throw new RuntimeException("must assign mail config file");
         }
-        EmailParams params = EmailParams.fromFile(args[0]);
+        final EmailParams params = EmailParams.fromFile(args[0]);
         if(params != null){
+            if(args.length > 1){
+                VisitServices.from(args).fireWithIndex(new FireIndexedVisitor<String>() {
+                    @Override
+                    public Void visit(Object param, String s, int index, int size) {
+                        //0 is config file
+                        if(index > 0){
+                            params.setIfNeed(s);
+                        }
+                        return null;
+                    }
+                });
+            }
             try {
                 new MailSender().send(params);
             } catch (Exception e) {
@@ -98,7 +111,7 @@ public final class MailSender {
         // 2. From: 发件人
         //    其中 InternetAddress 的三个参数分别为: 邮箱, 显示的昵称(只用于显示, 没有特别的要求), 昵称的字符集编码
         //    真正要发送时, 邮箱必须是真实有效的邮箱。
-        message.setFrom(new InternetAddress(params.getSender_acc(), "USER_1", "UTF-8"));
+        message.setFrom(new InternetAddress(params.getSender_acc(), params.getSender_name(), "UTF-8"));
 
         // 3. 收件人，抄送，密送
         addReceivers(params.getReceivers(), message, MimeMessage.RecipientType.TO, true);

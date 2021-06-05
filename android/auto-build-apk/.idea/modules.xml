@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/auto-build-apk.iml" filepath="$PROJECT_DIR$/auto-build-apk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/auto-build-apk_main.iml" filepath="$PROJECT_DIR$/.idea/modules/auto-build-apk_main.iml" group="auto-build-apk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/auto-build-apk_test.iml" filepath="$PROJECT_DIR$/.idea/modules/auto-build-apk_test.iml" group="auto-build-apk" />
+    </modules>
+  </component>
+</project>
