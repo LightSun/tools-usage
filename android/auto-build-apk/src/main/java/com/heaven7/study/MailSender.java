@@ -55,7 +55,7 @@ public final class MailSender {
     public void send(EmailParams params) throws Exception {
         params.verify();
         final Properties props = new Properties();
-        props.setProperty("mail.debug", "true");
+        //props.setProperty("mail.debug", "true");
         props.setProperty("mail.transport.protocol", params.getProtocol());   // 使用的协议（JavaMail规范要求）
         props.setProperty("mail.smtp.host", params.getProtocol_host());     // 发件人的邮箱的 SMTP 服务器地址
         props.setProperty("mail.smtp.auth", "true");            // 需要请求认证
@@ -92,6 +92,7 @@ public final class MailSender {
             VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
                 @Override
                 public Boolean visit(String filename, Object param) {
+                    System.out.println("start add file: " + filename);
                     try {
                         MimeBodyPart part = new MimeBodyPart();
                         part.setDataHandler(new DataHandler(new FileDataSource(filename)));
@@ -150,7 +151,6 @@ public final class MailSender {
         Transport transport = session.getTransport();
         transport.connect(params.getProtocol_host(), params.getSender_acc(), params.getSender_pwd());
         transport.sendMessage(message, message.getAllRecipients());
-        // 7. 关闭连接
         transport.close();
     }
 

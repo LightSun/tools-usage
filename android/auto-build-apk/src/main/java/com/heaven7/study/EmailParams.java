@@ -1,13 +1,16 @@
 package com.heaven7.study;
 
 import com.heaven7.java.base.util.*;
+import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.study.utils.ZipHelper;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class EmailParams {
 
@@ -47,6 +50,8 @@ public final class EmailParams {
     private long sendDate;
     private String protocol = "smtp";
     private String protocol_host = "smtp.qq.com";
+    private boolean compress;
+    private float compressLimitSize; //in M like: 50M
 
     private final Map<String, String> mExtras = new HashMap<>();
 
@@ -89,7 +94,9 @@ public final class EmailParams {
         VisitServices.from(lines).fire(new FireVisitor<String>() {
             @Override
             public Boolean visit(String s, Object param) {
-                obj.setIfNeed(s);
+                if(!s.startsWith("#")){
+                    obj.setIfNeed(s);
+                }
                 return null;
             }
         });
@@ -142,8 +149,17 @@ public final class EmailParams {
                         String dir;
                         if (value.contains("::")) {
                             String[] strs = value.split("::");
-                            exts.addAll(Arrays.asList(strs[0].split(",")));
+                            //'.' means all
+                            if(!strs[0].equals(".")){
+                                exts.addAll(Arrays.asList(strs[0].split(",")));
+                            }
                             dir = strs[1];
+                            //if need compress.
+                            if(strs.length >= 3){
+                                String[] compressParams = strs[2].split("_");
+                                setCompress(Boolean.parseBoolean(compressParams[0]));
+                                setCompressLimitSize(Float.parseFloat(compressParams[1]));
+                            }
                         } else {
                             dir = value;
                         }
@@ -161,7 +177,13 @@ public final class EmailParams {
                                 return ext != null && exts.contains(ext);
                             }
                         }, files);
-                        obj.setFiles(files);
+                        if(isCompress()){
+                            //need compress.
+                            List<String> zipFiles = doCompress(files);
+                            obj.setFiles(zipFiles);
+                        }else {
+                            obj.setFiles(files);
+                        }
                     }
                     break;
                 case KEY_FILES:
@@ -208,6 +230,70 @@ public final class EmailParams {
                     obj.getExtras().put(key, value);
             }
         }
+    }
+
+    private List<String> doCompress(List<String> files) {
+        if(Predicates.isEmpty(files)){
+            return null;
+        }
+        final int limitSize = (int) (compressLimitSize * 1024 * 1024);
+        System.out.println("limit size:  " + limitSize);
+        String dirName = new File(files.get(0)).getParentFile().getName();
+        String dir = FileUtils.getFileDir(files.get(0), 2, true);
+
+        List<String> zips = new ArrayList<>();
+        AtomicInteger zipIndex = new AtomicInteger(1);
+
+        VisitServices.from(files).fireWithIndex(new FireIndexedVisitor<String>() {
+            int totalSize = 0;
+            List<File> needZipFiles = new ArrayList<>();
+            @Override
+            public Void visit(Object param, String s, int index, int size) {
+                File curFile = new File(s);
+                if(totalSize + curFile.length() > limitSize){
+                    String dstZip = String.format("%s/%s_%d.zip", dir, dirName, zipIndex.get());
+                    //if zip file exist. remove
+                    if(new File(dstZip).exists()){
+                        new File(dstZip).delete();
+                    }
+                    if(!ZipHelper.zipFiles(needZipFiles, dstZip)){
+                        System.err.println("zip failed.");
+                    }else{
+                        zips.add(dstZip);
+                    }
+                    zipIndex.addAndGet(1);
+                    needZipFiles.clear();
+                    totalSize = 0;
+                }
+                needZipFiles.add(curFile);
+                totalSize += curFile.length();
+                if(index == size -1 ){
+                    //the last element. need zip
+                    String dstZip = String.format("%s/%s_%d.zip", dir, dirName, zipIndex.get());
+                    if(!ZipHelper.zipFiles(needZipFiles, dstZip)){
+                        System.err.println("zip failed.");
+                    }else{
+                        zips.add(dstZip);
+                    }
+                }
+                return null;
+            }
+        });
+        return zips;
+    }
+
+    public float getCompressLimitSize() {
+        return compressLimitSize;
+    }
+    public void setCompressLimitSize(float compressLimitSize) {
+        this.compressLimitSize = compressLimitSize;
+    }
+
+    public boolean isCompress() {
+        return compress;
+    }
+    public void setCompress(boolean compress) {
+        this.compress = compress;
     }
 
     public String getSender_name() {
