@@ -78,7 +78,7 @@ public final class MailSender {
 
         // 1. 创建一封邮件
         Session session = Session.getInstance(props);        // 根据参数配置，创建会话对象（为了发送邮件准备的）
-        MimeMessage message = new MimeMessage(session);     // 创建邮件对象
+        MimeMessage message = new MimeMessage(session);      // 创建邮件对象
 
         //body
         Multipart multipart = new MimeMultipart();

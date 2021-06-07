@@ -1,5 +1,7 @@
 package com.heaven7.study.utils;
 
+import com.heaven7.java.base.util.FileUtils;
+
 import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -38,7 +40,9 @@ public final class ZipHelper {
                 if (file.isDirectory()) {
                     recursionZip(zos, file, file.getName() + File.separator);
                 } else {
-                    recursionZip(zos, file, "");
+                    //recursionZip(zos, file, "");
+                    String dir = FileUtils.getFileDir(file.getAbsolutePath(), 1, false);
+                    recursionZip(zos, file, dir + "_");
                 }
             }
             zos.flush();
@@ -60,7 +64,7 @@ public final class ZipHelper {
 
     private static void recursionZip(ZipOutputStream zipOut, File file, String baseDir) throws Exception {
         if (file.isDirectory()) {
-            System.out.println("the file is dir name -->>" + file.getName() + " the baseDir-->>>" + baseDir);
+            //System.out.println("the file is dir name -->>" + file.getName() + " the baseDir-->>>" + baseDir);
             File[] files = file.listFiles();
             for (File fileSec : files) {
                 if (fileSec == null) {
@@ -68,15 +72,15 @@ public final class ZipHelper {
                 }
                 if (fileSec.isDirectory()) {
                     baseDir = file.getName() + File.separator + fileSec.getName() + File.separator;
-                    System.out.println("basDir111-->>" + baseDir);
+                   // System.out.println("basDir111-->>" + baseDir);
                     recursionZip(zipOut, fileSec, baseDir);
                 } else {
-                    System.out.println( "basDir222-->>" + baseDir);
+                   // System.out.println( "basDir222-->>" + baseDir);
                     recursionZip(zipOut, fileSec, baseDir);
                 }
             }
         } else {
-            System.out.println("the file name is -->>" + file.getName() + " the base dir -->>" + baseDir);
+           // System.out.println("the file name is -->>" + file.getName() + " the base dir -->>" + baseDir);
             byte[] buf = new byte[BUFF_SIZE];
             InputStream input = new BufferedInputStream(new FileInputStream(file));
             zipOut.putNextEntry(new ZipEntry(baseDir + file.getName()));
