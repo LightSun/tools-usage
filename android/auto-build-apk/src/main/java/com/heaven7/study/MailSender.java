@@ -1,9 +1,12 @@
 package com.heaven7.study;
 
+import com.heaven7.java.base.util.FileUtils;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.TextUtils;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.MapFireVisitor;
+import com.heaven7.java.visitor.collection.KeyValuePair;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.sun.mail.util.MailSSLSocketFactory;
 
@@ -18,13 +21,43 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-public class MailSender {
+public final class MailSender {
+
+    //可以动态指定 发送的文件和或者文件夹
+    public static void main(String[] args) {
+        if(args.length == 0){
+            throw new RuntimeException("must assign mail config file");
+        }
+        final EmailParams params = EmailParams.fromFile(args[0]);
+        if(params != null){
+            if(args.length > 1){
+                VisitServices.from(args).fireWithIndex(new FireIndexedVisitor<String>() {
+                    @Override
+                    public Void visit(Object param, String s, int index, int size) {
+                        //0 is config file
+                        if(index > 0){
+                            params.setIfNeed(s);
+                        }
+                        return null;
+                    }
+                });
+            }
+            try {
+                new MailSender().send(params);
+            } catch (Exception e) {
+                throw new RuntimeException("send email failed", e);
+            }
+        }else {
+            throw new RuntimeException("load mail config file failed from " + args[0]);
+        }
+    }
 
     public void send(EmailParams params) throws Exception {
-        Properties props = new Properties();
-        props.setProperty("mail.debug", "true");
-        props.setProperty("mail.transport.protocol", "smtp");   // 使用的协议（JavaMail规范要求）
-        props.setProperty("mail.smtp.host", "smtp.qq.com");     // 发件人的邮箱的 SMTP 服务器地址
+        params.verify();
+        final Properties props = new Properties();
+        //props.setProperty("mail.debug", "true");
+        props.setProperty("mail.transport.protocol", params.getProtocol());   // 使用的协议（JavaMail规范要求）
+        props.setProperty("mail.smtp.host", params.getProtocol_host());     // 发件人的邮箱的 SMTP 服务器地址
         props.setProperty("mail.smtp.auth", "true");            // 需要请求认证
         //often need ssl
         if (params.isEnableSsl()) {
@@ -32,6 +65,15 @@ public class MailSender {
             sf.setTrustAllHosts(true);
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.ssl.socketFactory", sf);
+        }
+        if(!params.getExtras().isEmpty()){
+            VisitServices.from(params.getExtras()).fire(new MapFireVisitor<String, String>() {
+                @Override
+                public Boolean visit(KeyValuePair<String, String> pair, Object param) {
+                    props.put(pair.getKey(), pair.getValue());
+                    return null;
+                }
+            });
         }
 
         // 1. 创建一封邮件
@@ -50,12 +92,14 @@ public class MailSender {
             VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
                 @Override
                 public Boolean visit(String filename, Object param) {
+                    System.out.println("start add file: " + filename);
                     try {
                         MimeBodyPart part = new MimeBodyPart();
                         part.setDataHandler(new DataHandler(new FileDataSource(filename)));
 
                         //处理附件名称中文（附带文件路径）乱码问题
-                        part.setFileName(MimeUtility.encodeText(filename));
+                        String name = MimeUtility.encodeText(FileUtils.getSimpleFileName(filename));
+                        part.setFileName(name);
                         multipart.addBodyPart(part);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -68,9 +112,9 @@ public class MailSender {
         // 2. From: 发件人
         //    其中 InternetAddress 的三个参数分别为: 邮箱, 显示的昵称(只用于显示, 没有特别的要求), 昵称的字符集编码
         //    真正要发送时, 邮箱必须是真实有效的邮箱。
-        message.setFrom(new InternetAddress(params.getSender_acc(), "USER_1", "UTF-8"));
+        message.setFrom(new InternetAddress(params.getSender_acc(), params.getSender_name(), "UTF-8"));
 
-        // 3. To: 收件人
+        // 3. 收件人，抄送，密送
         addReceivers(params.getReceivers(), message, MimeMessage.RecipientType.TO, true);
         addReceivers(params.getReceivers_copy(), message, MimeMessage.RecipientType.CC, false);
         addReceivers(params.getReceivers_safe_copy(), message, MimeMessage.RecipientType.BCC, false);
@@ -81,16 +125,20 @@ public class MailSender {
         // message.setContent("这是邮件正文", "text/html;charset=UTF-8");
         message.setContent(multipart);
 
-        // 6. 设置显示的发件时间
-        message.setSentDate(new Date());
+        // 6. 设置发件时间
+        if(params.getSendDate() > 0){
+            message.setSentDate(new Date(params.getSendDate()));
+        }else {
+            message.setSentDate(new Date());
+        }
 
         // 7. 保存前面的设置
         message.saveChanges();
 
         // 8. 将该邮件保存到本地
-        if(params.getSaveFile() != null){
+        if(!TextUtils.isEmpty(params.getSaveFile())){
             File file = new File(params.getSaveFile());
-            if(!file.getParentFile().exists()){
+            if(file.getParentFile() != null && !file.getParentFile().exists()){
                 file.getParentFile().mkdirs();
             }
             OutputStream out = new FileOutputStream(params.getSaveFile());
@@ -101,9 +149,8 @@ public class MailSender {
 
         //connect
         Transport transport = session.getTransport();
-        transport.connect("smtp.qq.com", "532278976@qq.com", "lwyxlemzxynkbjjc");
+        transport.connect(params.getProtocol_host(), params.getSender_acc(), params.getSender_pwd());
         transport.sendMessage(message, message.getAllRecipients());
-        // 7. 关闭连接
         transport.close();
     }
 

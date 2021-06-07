@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.heaven7.study.CmdBuilderTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-06-02T09:23:29" hostname="USER-20190926CE" time="0.051">
-  <properties/>
-  <testcase name="test1" classname="com.heaven7.study.CmdBuilderTest" time="0.051"/>
-  <system-out><![CDATA[ >>> start execute cmd: cmd set http_proxy=http://127.0.0.1:1080 & https_proxy=http://127.0.0.1:1080
-cmd set http_proxy=http://127.0.0.1:1080 & https_proxy=http://127.0.0.1:1080  ,exitValue = 0
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

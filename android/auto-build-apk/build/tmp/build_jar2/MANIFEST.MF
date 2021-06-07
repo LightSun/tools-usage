@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Premain-Class: Capsule
-Application-Class: com.heaven7.study.ApkParamTool
-Main-Class: Capsule
-

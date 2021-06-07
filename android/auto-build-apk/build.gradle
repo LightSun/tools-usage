@@ -57,3 +57,8 @@ task build_jar2(type: FatCapsule){
     baseName 'ApkParamTool'
 }
 
+task build_mailSender(type: FatCapsule){
+    applicationClass 'com.heaven7.study.MailSender'
+    baseName 'MailSender'
+}
+
