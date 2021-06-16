@@ -122,7 +122,6 @@ public class CmdHelper {
         }
         @Override
         public void onStart(CmdHelper helper) {
-
         }
         @Override
         public void onEnd(CmdHelper helper) {

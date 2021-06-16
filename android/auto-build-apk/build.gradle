@@ -62,3 +62,8 @@ task build_mailSender(type: FatCapsule){
     baseName 'MailSender'
 }
 
+task build_win32dll2lib(type: FatCapsule){
+    applicationClass 'com.heaven7.study.dll.GccDllToWin32Lib'
+    baseName 'GccDllToWin32Lib'
+}
+
