@@ -5,74 +5,61 @@ import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.ResultVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.study.CmdBuilder;
-import com.heaven7.study.CmdHelper;
+import com.heaven7.study.api.BaseCmdExecutor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class GccDllToWin32Lib {
+public final class MsvcDll2Gcc extends BaseCmdExecutor {
 
-    private DllToWin32Param param;
+    //pexport xxx.dll > xxx.def
+    //dlltool.exe -D xxx.dll -d xxx.def -l xxx.dll.a -k
+
+    private MsvcDll2GccParam param;
     private String arch;
-    private String inputDll;
     private String outDir;
     private final List<String> toDefCmds = new ArrayList<>();
 
-    public GccDllToWin32Lib(String configFile, String arch, String inputDll, String outDir) {
-        this.param = DllToWin32Param.from(configFile);
+    public MsvcDll2Gcc(String configFile, String arch, String inputDll, String outDir) {
+        super(inputDll);
+        this.param = MsvcDll2GccParam.from(configFile);
         this.arch = arch;
-        this.inputDll = inputDll;
         this.outDir = outDir;
-        if(param == null){
-            throw new RuntimeException();
+        File dir = new File(outDir);
+        if(!dir.exists()){
+            dir.mkdirs();
         }
     }
-    public void execute(){
-        execute(inputDll);
-    }
-    public void execute(List<String> dlls){
-        VisitServices.from(dlls).fire(new FireVisitor<String>() {
-            @Override
-            public Boolean visit(String s, Object param) {
-                execute(s);
-                return null;
-            }
-        });
-    }
-    public void execute(String inputDll){
-        String fileName = FileUtils.getFileName(inputDll);
+    @Override
+    public void execute(String input) {
+        String fileName = FileUtils.getFileName(input);
         String defFilePath = outDir + "/" + fileName + ".def";
-        //pexports.exe E:\study\cpp\msys2_64\mingw64\bin\libgpr.dll > libgpr2.def
-        //E:\visualstudio\ide\VC\Tools\MSVC\14.16.27023\bin\Hostx64\x64\lib.exe /def:libgpr2.def /machine:x64 /out:libgpr.lib
-        //1, to def
+        //pexport xxx.dll > xxx.def
         CmdBuilder cmdBuilder = new CmdBuilder()
-                .str(param.getPexportsDir() + "/pexports.exe")
-                .str(inputDll)
-                //.str(">")
-                .str("1>"+defFilePath);
+                .str(param.getPexports_dir() + "/pexports.exe")
+                .str(input)
+                .str("1>" + defFilePath);
+        doExecuteCmd(cmdBuilder.toCmd());
 
-        CmdHelper cmd = new CmdHelper(cmdBuilder.toCmd());
-        System.out.println(" >>> start execute cmd: " + cmd.getCmdActually());
-        if(!cmd.execute(new CmdHelper.InhertIoCallback())){
-            System.err.println(">>> execute failed.");
-        }else{
-            System.err.println(">>> execute success.");
-        }
-        toDefCmds.add(cmd.getCmdActually());
-        //2, to lib
-        String libDir = arch.equals("x64") ? param.getLib_x64_dir() : param.getLib_x86_dir();
-        cmdBuilder = new CmdBuilder().str(libDir + "/lib.exe")
-                .str("/def:" + defFilePath)
-                .str("/machine:" + arch)
-                .str("/out:" + outDir + "/" + fileName + ".lib");
-
-        cmd = new CmdHelper(cmdBuilder.toCmd());
-        System.out.println(" >>> start execute cmd: " + cmd.getCmdActually());
-        if(!cmd.execute(new CmdHelper.InhertIoCallback())){
-            System.err.println(">>> execute failed.");
-        }else{
-            System.err.println(">>> execute success.");
+        //dlltool.exe -D xxx.dll -d xxx.def -l xxx.dll.a -k
+        String libDir = arch.equals("x64") ? param.getDllTool_x64_dir() : param.getDllTool_x86_dir();
+        String outFile = outDir + "/" + fileName + ".dll.a";
+        cmdBuilder = new CmdBuilder()
+                .str(libDir + "/dlltool.exe")
+                .str("-D")
+                .str(input)
+                .str("-d")
+                .str(defFilePath)
+                .str("-l")
+                .str(outFile)
+                .str("-k");
+        doExecuteCmd(cmdBuilder.toCmd());
+    }
+    @Override
+    protected void onPreExecuteCmd(String cmd) {
+        if(cmd.startsWith(param.getPexports_dir())){
+            toDefCmds.add(cmd);
         }
     }
 
@@ -93,7 +80,7 @@ public final class GccDllToWin32Lib {
             throw new IllegalArgumentException("param error, should be: java -jar xxx.jar xxx.properties -arch=<x64/x86> <input dll> <outDir>");
         }*/
         String arch = args[1].substring(6);
-        GccDllToWin32Lib instance = new GccDllToWin32Lib(args[0], arch, args[2], args[3]);
+        MsvcDll2Gcc instance = new MsvcDll2Gcc(args[0], arch, args[2], args[3]);
         if(args[2].endsWith("dll")){
             //single dll
             instance.execute();

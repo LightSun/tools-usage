@@ -25,7 +25,6 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
-
 repositories {
     jcenter()
     mavenCentral()
@@ -62,8 +61,14 @@ task build_mailSender(type: FatCapsule){
     baseName 'MailSender'
 }
 
+//gcc dll to win32/msvc lib
 task build_win32dll2lib(type: FatCapsule){
     applicationClass 'com.heaven7.study.dll.GccDllToWin32Lib'
     baseName 'GccDllToWin32Lib'
+}
+//msvc dll to gcc lib
+task build_msvc_dll2gcc(type: FatCapsule){
+    applicationClass 'com.heaven7.study.dll.MsvcDll2Gcc'
+    baseName 'MsvcDll2Gcc'
 }
 

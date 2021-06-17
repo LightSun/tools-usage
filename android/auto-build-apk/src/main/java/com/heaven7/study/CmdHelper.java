@@ -50,6 +50,7 @@ public class CmdHelper {
             if(workDir != null){
                 pb.directory(new File(workDir));
             }
+            //System.out.println(pb.environment());
             pb.redirectErrorStream(true);
             callback.beforeStartCmd(this, pb);
             Process process = pb.start();
