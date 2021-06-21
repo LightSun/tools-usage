@@ -25,6 +25,7 @@ public final class MailSender {
 
     //可以动态指定 发送的文件和或者文件夹
     public static void main(String[] args) {
+        //java -jar MailSender-1.0-SNAPSHOT-capsule.jar mail_config.properties
         if(args.length == 0){
             throw new RuntimeException("must assign mail config file");
         }
@@ -43,22 +44,58 @@ public final class MailSender {
                 });
             }
             try {
-                new MailSender().send(params);
+                if (!Predicates.isEmpty(params.getFiles())) {
+                    //if send file separate
+                    if(params.isSend_file_separate()){
+                        VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
+                            @Override
+                            public Boolean visit(String s, Object param) {
+                                try {
+                                    new MailSender().send(params, s);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+                        });
+                    }else{
+                        new MailSender().send(params, null);
+                    }
+                }else{
+                    new MailSender().send(params, null);
+                }
             } catch (Exception e) {
                 throw new RuntimeException("send email failed", e);
+            }finally {
+                VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
+                    @Override
+                    public Boolean visit(String s, Object param) {
+                        if(params.isCompress() && s.endsWith(".zip")){
+                            new File(s).delete();
+                        }
+                        return null;
+                    };
+                });
             }
         }else {
             throw new RuntimeException("load mail config file failed from " + args[0]);
         }
     }
 
-    public void send(EmailParams params) throws Exception {
+    //HBIGIOKVOWRHVHML 163
+    //file1 null: means all files
+    public void send(EmailParams params, String file1) throws Exception {
         params.verify();
         final Properties props = new Properties();
         //props.setProperty("mail.debug", "true");
         props.setProperty("mail.transport.protocol", params.getProtocol());   // 使用的协议（JavaMail规范要求）
         props.setProperty("mail.smtp.host", params.getProtocol_host());     // 发件人的邮箱的 SMTP 服务器地址
         props.setProperty("mail.smtp.auth", "true");            // 需要请求认证
+
+        if(params.getProtocol_host().contains(".163.")){
+            props.setProperty("mail.smtp.starttls.enable", "true");
+            props.setProperty("mail.imap.socketFactory.fallback", "false");
+        }
         //often need ssl
         if (params.isEnableSsl()) {
             MailSSLSocketFactory sf = new MailSSLSocketFactory();
@@ -77,7 +114,9 @@ public final class MailSender {
         }
 
         // 1. 创建一封邮件
-        Session session = Session.getInstance(props);        // 根据参数配置，创建会话对象（为了发送邮件准备的）
+        Session session;
+            session = Session.getInstance(props);        // 根据参数配置，创建会话对象（为了发送邮件准备的）
+
         MimeMessage message = new MimeMessage(session);      // 创建邮件对象
 
         //body
@@ -88,25 +127,39 @@ public final class MailSender {
         multipart.addBodyPart(bodyPart);
 
         // 附件部分
-        if (!Predicates.isEmpty(params.getFiles())) {
-            VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
-                @Override
-                public Boolean visit(String filename, Object param) {
-                    System.out.println("start add file: " + filename);
-                    try {
-                        MimeBodyPart part = new MimeBodyPart();
-                        part.setDataHandler(new DataHandler(new FileDataSource(filename)));
+        if(TextUtils.isEmpty(file1)){
+            if (!Predicates.isEmpty(params.getFiles())) {
+                VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
+                    @Override
+                    public Boolean visit(String filename, Object param) {
+                        System.out.println("start add file: " + filename);
+                        try {
+                            MimeBodyPart part = new MimeBodyPart();
+                            part.setDataHandler(new DataHandler(new FileDataSource(filename)));
 
-                        //处理附件名称中文（附带文件路径）乱码问题
-                        String name = MimeUtility.encodeText(FileUtils.getSimpleFileName(filename));
-                        part.setFileName(name);
-                        multipart.addBodyPart(part);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                            //处理附件名称中文（附带文件路径）乱码问题
+                            String name = MimeUtility.encodeText(FileUtils.getSimpleFileName(filename));
+                            part.setFileName(name);
+                            multipart.addBodyPart(part);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
+            }
+        }else{
+            try {
+                MimeBodyPart part = new MimeBodyPart();
+                part.setDataHandler(new DataHandler(new FileDataSource(file1)));
+
+                //处理附件名称中文（附带文件路径）乱码问题
+                String name = MimeUtility.encodeText(FileUtils.getSimpleFileName(file1));
+                part.setFileName(name);
+                multipart.addBodyPart(part);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // 2. From: 发件人
