@@ -72,3 +72,8 @@ task build_msvc_dll2gcc(type: FatCapsule){
     baseName 'MsvcDll2Gcc'
 }
 
+task build_socketServer(type: FatCapsule){
+    applicationClass 'com.heaven7.tool.socket.SocketServerManager'
+    baseName 'SocketServerManager'
+}
+
