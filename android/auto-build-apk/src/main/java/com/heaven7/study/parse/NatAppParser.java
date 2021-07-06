@@ -2,9 +2,12 @@ package com.heaven7.study.parse;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.TextReadHelper;
 import com.heaven7.java.visitor.FireVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
+import com.heaven7.study.CmdBuilder;
+import com.heaven7.study.CmdHelper;
 import com.heaven7.study.parse.bean.LoginRes;
 import com.heaven7.study.utils.OkHttpUtils;
 import okhttp3.*;
@@ -13,25 +16,47 @@ import java.util.List;
 
 public final class NatAppParser {
 
+    private final String natAppPath;
     private final String path;
     private final String typeSuffix;
 
-    public NatAppParser(String path, String typeSuffix) {
+    public NatAppParser(String natAppPath, String path, String typeSuffix) {
+        this.natAppPath = natAppPath;
         this.path = path;
         this.typeSuffix = typeSuffix;
     }
 
     public static void main(String[] args) {
+        String natAppPath;
         String logPath;
         String typeSuffix;
-        if(args.length < 2){
+        if(args.length < 3){
+            natAppPath = "";
             logPath = "D:\\study\\github\\mine2\\tools-usage\\android\\auto-build-apk\\config\\log.txt";
             typeSuffix = "-camera-server";
         }else{
-            logPath = args[0];
-            typeSuffix = args[1];
+            natAppPath = args[0];
+            logPath = args[1];
+            typeSuffix = args[2];
         }
-        new NatAppParser(logPath, typeSuffix).parse();
+        new NatAppParser(natAppPath, logPath, typeSuffix).startNatApp();
+    }
+
+    public void startNatApp(){
+        if(!Predicates.isEmpty(natAppPath)){
+            CmdBuilder cmdBuilder = new CmdBuilder()
+                    .str("start /d")
+                    .str(natAppPath);
+
+            CmdHelper cmd = new CmdHelper(cmdBuilder.toCmd());
+            System.out.println(" >>> start execute cmd: " + cmd.getCmdActually());
+            if(!cmd.execute(new CmdHelper.InhertIoCallback())){
+                System.err.println(">>> execute failed.");
+            }else{
+                System.err.println(">>> execute success.");
+            }
+        }
+        parse();
     }
 
     public void parse() {
