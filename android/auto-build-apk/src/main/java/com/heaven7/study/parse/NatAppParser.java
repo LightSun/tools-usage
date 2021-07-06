@@ -45,7 +45,7 @@ public final class NatAppParser {
     public void startNatApp(){
         if(!Predicates.isEmpty(natAppPath)){
             CmdBuilder cmdBuilder = new CmdBuilder()
-                    .str("start /d")
+                    .str("start")
                     .str(natAppPath);
 
             CmdHelper cmd = new CmdHelper(cmdBuilder.toCmd());
