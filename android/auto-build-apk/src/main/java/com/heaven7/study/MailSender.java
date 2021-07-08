@@ -27,10 +27,15 @@ public final class MailSender {
     public static void main(String[] args) {
         //java -jar MailSender-1.0-SNAPSHOT-capsule.jar mail_config.properties
         if(args.length == 0){
-            throw new RuntimeException("must assign mail config file");
+            args = new String[]{
+                "F:\\test\\emailSender\\mail_config.properties",
+                "prefix=22",
+            };
+
         }
         final EmailParams params = EmailParams.fromFile(args[0]);
         if(params != null){
+            //override parameter
             if(args.length > 1){
                 VisitServices.from(args).fireWithIndex(new FireIndexedVisitor<String>() {
                     @Override
@@ -43,6 +48,8 @@ public final class MailSender {
                     }
                 });
             }
+            //do post
+            params.precessPostTasks();
             try {
                 if (!Predicates.isEmpty(params.getFiles())) {
                     //if send file separate

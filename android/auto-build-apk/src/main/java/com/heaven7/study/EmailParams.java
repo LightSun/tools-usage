@@ -3,6 +3,7 @@ package com.heaven7.study;
 import com.heaven7.java.base.util.*;
 import com.heaven7.java.visitor.FireIndexedVisitor;
 import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.study.utils.ZipHelper;
 
@@ -32,6 +33,7 @@ public final class EmailParams {
     public static final String KEY_PROTOCOL = "protocol";
     public static final String KEY_PROTOCOL_HOST = "protocol_host";
     public static final String KEY_SEND_FILE_SEPARATE = "send_file_separate";
+    public static final String KEY_PREFIX = "prefix";
 
 
     private String sender_acc;//need
@@ -55,8 +57,19 @@ public final class EmailParams {
     private float compressLimitSize; //in M like: 50M
 
     private boolean send_file_separate;
+    private String prefix = "";
 
     private final Map<String, String> mExtras = new HashMap<>();
+
+    private List<String> mPostCompressFiles;
+
+    //-----------------------------------------------------------------------
+    private static final Map<String,Integer> sWeightMap = new HashMap<>();
+
+    static {
+        sWeightMap.put(KEY_PREFIX, 0);
+    }
+    //-------------------------------------------------------------------------
 
     public void verify() {
         if (TextUtils.isEmpty(sender_acc)) {
@@ -92,7 +105,23 @@ public final class EmailParams {
         } finally {
             IOUtils.closeQuietly(reader);
         }
+        lines = VisitServices.from(lines).filter(new PredicateVisitor<String>() {
+            @Override
+            public Boolean visit(String s, Object param) {
+                return !s.startsWith("#");
+            }
+        }).getAsList();
         final EmailParams obj = new EmailParams();
+        Collections.sort(lines, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                String[] ks1 = o1.split("=");
+                String[] ks2 = o2.split("=");
+                Integer v1 = sWeightMap.getOrDefault(ks1[0], 100);
+                Integer v2 = sWeightMap.getOrDefault(ks2[0], 100);
+                return Integer.compare(v1, v2);
+            }
+        });
 
         VisitServices.from(lines).fire(new FireVisitor<String>() {
             @Override
@@ -183,10 +212,12 @@ public final class EmailParams {
                                 return ext != null && exts.contains(ext);
                             }
                         }, files);
+
                         if (isCompress()) {
                             //need compress.
-                            List<String> zipFiles = doCompress(files);
-                            obj.setFiles(zipFiles);
+                            /*List<String> zipFiles = doCompress(files);
+                            obj.setFiles(zipFiles);*/
+                            mPostCompressFiles = files;
                         } else {
                             obj.setFiles(files);
                         }
@@ -236,10 +267,20 @@ public final class EmailParams {
                     obj.setSend_file_separate(Boolean.parseBoolean(value));
                     break;
 
+                case KEY_PREFIX:
+                    obj.setPrefix(value);
+                    break;
+
                 default:
                     obj.getExtras().put(key, value);
             }
         }
+    }
+
+    public void precessPostTasks(){
+        //process post files
+        List<String> files = doCompress(mPostCompressFiles);
+        setFiles(files);
     }
 
     private List<String> doCompress(List<String> files) {
@@ -248,8 +289,9 @@ public final class EmailParams {
         }
         final int limitSize = (int) (compressLimitSize * 1024 * 1024);
         System.out.println("limit size:  " + limitSize);
-        String dirName = new File(files.get(0)).getParentFile().getName();
+        //String dirName = new File(files.get(0)).getParentFile().getName();
         String dir = FileUtils.getFileDir(files.get(0), 2, true);
+        String pdirName = FileUtils.getFileDir(files.get(0), 2, false);
 
         List<String> zips = new ArrayList<>();
         AtomicInteger zipIndex = new AtomicInteger(1);
@@ -262,7 +304,8 @@ public final class EmailParams {
             public Void visit(Object param, String s, int index, int size) {
                 File curFile = new File(s);
                 if (totalSize + curFile.length() > limitSize) {
-                    String dstZip = String.format("%s/%s_%d.zip", dir, dirName, zipIndex.get());
+                    String dstZip = String.format("%s/%s__%s_%d.zip", dir, prefix, pdirName, zipIndex.get());
+                    System.out.println("dstZip: " + dstZip);
                     //if zip file exist. remove
                     if (new File(dstZip).exists()) {
                         new File(dstZip).delete();
@@ -280,7 +323,8 @@ public final class EmailParams {
                 totalSize += curFile.length();
                 if (index == size - 1) {
                     //the last element. need zip
-                    String dstZip = String.format("%s/%s_%d.zip", dir, dirName, zipIndex.get());
+                    String dstZip = String.format("%s/%s__%s_%d.zip", dir, prefix, pdirName, zipIndex.get());
+                    System.out.println("dstZip: " + dstZip);
                     if (!ZipHelper.zipFiles(needZipFiles, dstZip)) {
                         System.err.println("zip failed.");
                     } else {
@@ -291,6 +335,13 @@ public final class EmailParams {
             }
         });
         return zips;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     public boolean isSend_file_separate() {
