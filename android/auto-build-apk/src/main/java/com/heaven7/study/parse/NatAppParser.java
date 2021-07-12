@@ -16,13 +16,13 @@ import java.util.List;
 
 public final class NatAppParser {
 
-    private final String domain;
+    private final String mReqDomain;
     private final String natAppPath;
     private final String path;
     private final String typeSuffix;
 
     public NatAppParser(String domain, String natAppPath, String path, String typeSuffix) {
-        this.domain = domain;
+        this.mReqDomain = domain;
         this.natAppPath = natAppPath;
         this.path = path;
         this.typeSuffix = typeSuffix;
@@ -84,7 +84,7 @@ public final class NatAppParser {
     }
     //like tcp, server.natappfree.cc, 36851
     private void callServer(String protocol, String domain, String port) {
-        final String url = domain + "api/sys/QR/addScrapQr";
+        final String url = mReqDomain + "api/sys/QR/addScrapQr";
         login(new OkHttpUtils.StringCallback() {
             public void call(String token) {
                 JsonObject je = new JsonObject();
@@ -108,7 +108,7 @@ public final class NatAppParser {
     }
 
     private void login(OkHttpUtils.StringCallback next) {
-        String url = domain + "api/auth/login";
+        String url = mReqDomain + "api/auth/login";
         JsonObject je = new JsonObject();
         je.addProperty("userType", "0");
         je.addProperty("clientKey", "identify-sys-admin");
