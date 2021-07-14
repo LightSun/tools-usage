@@ -36,7 +36,7 @@ public final class NatAppParser {
         if(args.length < 3){
             natAppPath = "";
             logPath = "D:\\study\\github\\mine2\\tools-usage\\android\\auto-build-apk\\config\\log.txt";
-            typeSuffix = "-camera-server";
+            typeSuffix = "-api-server";
         }else{
             natAppPath = args[0];
             logPath = args[1];

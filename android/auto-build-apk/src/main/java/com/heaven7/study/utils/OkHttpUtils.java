@@ -10,11 +10,13 @@ public final class OkHttpUtils {
     private static final OkHttpClient sClient = new OkHttpClient();
 
     public static void post(String url, String json, HeaderCallback hc, StringCallback cb) {
+        System.out.println("post: url = " + url);
         RequestBody body = RequestBody.create(JSON, json);
         Request.Builder builder = new Request.Builder().url(url);
         if (hc != null) {
             hc.addHeader(builder);
         }
+        System.out.println("json = " + json);
         Request request = builder
                 .post(body)
                 .build();
@@ -28,12 +30,14 @@ public final class OkHttpUtils {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String str = response.body().string();
+                System.out.println("res: \n" + str);
                 cb.call(str);
             }
         });
     }
 
     public static void get(String url, HeaderCallback hc, StringCallback cb) {
+        System.out.println("get: url = " + url);
         Request.Builder builder = new Request.Builder().url(url);
         if (hc != null) {
             hc.addHeader(builder);
@@ -51,6 +55,7 @@ public final class OkHttpUtils {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String str = response.body().string();
+                System.out.println("res: \n" + str);
                 cb.call(str);
             }
         });
