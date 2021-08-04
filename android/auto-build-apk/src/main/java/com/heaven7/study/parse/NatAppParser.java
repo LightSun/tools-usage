@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.heaven7.java.base.util.Predicates;
 import com.heaven7.java.base.util.TextReadHelper;
 import com.heaven7.java.visitor.FireVisitor;
+import com.heaven7.java.visitor.PredicateVisitor;
 import com.heaven7.java.visitor.collection.VisitServices;
 import com.heaven7.study.CmdBuilder;
 import com.heaven7.study.CmdHelper;
@@ -66,21 +67,24 @@ public final class NatAppParser {
     }
 
     public void parse() {
+        String str = "Tunnel established at";
         TextReadHelper<String> helper = new TextReadHelper<>(new ReaderCallback0());
         List<String> list = helper.read(null, path);
-        VisitServices.from(list).fire(new FireVisitor<String>() {
+        List<String> lines = VisitServices.from(list).filter(new PredicateVisitor<String>() {
             @Override
             public Boolean visit(String s, Object param) {
-                String str = "Tunnel established at";
-                if (s.contains(str)) {
-                    String subStr = s.substring(s.indexOf(str) + str.length() + 1).trim();
-                    String[] strs = subStr.split(":");
-                    //tcp://server.natappfree.cc:36851
-                    callServer(strs[0], strs[1].substring(2), strs[2]);
-                }
-                return null;
+                return s.contains(str);
             }
-        });
+        }).getAsList();
+        System.out.println(lines);
+        //only use last line
+        if(!Predicates.isEmpty(lines)){
+            String s = lines.get(lines.size() - 1);
+            String subStr = s.substring(s.indexOf(str) + str.length() + 1).trim();
+            String[] strs = subStr.split(":");
+            //tcp://server.natappfree.cc:36851
+            callServer(strs[0], strs[1].substring(2), strs[2]);
+        }
     }
     //like tcp, server.natappfree.cc, 36851
     private void callServer(String protocol, String domain, String port) {
@@ -113,7 +117,8 @@ public final class NatAppParser {
         je.addProperty("userType", "0");
         je.addProperty("clientKey", "identify-sys-admin");
         je.addProperty("loginType", "0");
-        je.addProperty("loginName", "QJOne");
+        //je.addProperty("loginName", "QJOne");
+        je.addProperty("loginName", "QJTwo");
         je.addProperty("password", "Aa123456");
         OkHttpUtils.post(url, je.toString(), null, new OkHttpUtils.StringCallback() {
             @Override
