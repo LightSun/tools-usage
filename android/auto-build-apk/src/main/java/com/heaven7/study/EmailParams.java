@@ -278,9 +278,11 @@ public final class EmailParams {
     }
 
     public void precessPostTasks(){
-        //process post files
-        List<String> files = doCompress(mPostCompressFiles);
-        setFiles(files);
+        if(!Predicates.isEmpty(mPostCompressFiles)){
+            //process post files
+            List<String> files = doCompress(mPostCompressFiles);
+            setFiles(files);
+        }
     }
 
     private List<String> doCompress(List<String> files) {

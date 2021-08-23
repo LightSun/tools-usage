@@ -6,6 +6,10 @@ import com.heaven7.study.CmdHelper;
 
 import java.util.List;
 
+/**
+ * in windows some cmd: run failed in java. but success when copy to cmd.exe
+ *  recommend use: cmd.exe /C "cd /D ..."
+ */
 public abstract class BaseCmdExecutor{
 
     private final String input;
@@ -28,6 +32,11 @@ public abstract class BaseCmdExecutor{
             }
         });
     }
+
+    /**
+     * should call doExecuteCmd(String[]) in this method.
+     * @param input the input cmd
+     */
     public abstract void execute(String input);
 
     public void doExecuteCmd(String[] str){

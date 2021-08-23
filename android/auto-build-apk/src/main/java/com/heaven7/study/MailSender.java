@@ -74,15 +74,19 @@ public final class MailSender {
             } catch (Exception e) {
                 throw new RuntimeException("send email failed", e);
             }finally {
-                VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
-                    @Override
-                    public Boolean visit(String s, Object param) {
-                        if(params.isCompress() && s.endsWith(".zip")){
-                            new File(s).delete();
+                if (!Predicates.isEmpty(params.getFiles())) {
+                    VisitServices.from(params.getFiles()).fire(new FireVisitor<String>() {
+                        @Override
+                        public Boolean visit(String s, Object param) {
+                            if (params.isCompress() && s.endsWith(".zip")) {
+                                new File(s).delete();
+                            }
+                            return null;
                         }
-                        return null;
-                    };
-                });
+
+                        ;
+                    });
+                }
             }
         }else {
             throw new RuntimeException("load mail config file failed from " + args[0]);
