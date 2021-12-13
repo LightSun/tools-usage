@@ -6,7 +6,7 @@ import com.heaven7.study.api.BaseCmdExecutor;
 
 /**
  * steps:
- * 1, use pdal to convert pcd/others to las
+ * 1, use pdal to convert pcd/obj/others to las
  * 2, use potreeconverter convert las to potree files.
  * 3, generate write html.
  */
@@ -18,6 +18,8 @@ public final class EntryHtmlGenerator extends BaseCmdExecutor{
         super("");
     }
 
+    //pdal translate D:\360Downloads\pcl_files\71_final.obj D:\360Downloads\pcl_files\71_final_2.las
+    //PotreeConverter.exe D:/360Downloads/pcl_files/71_final_2.las -o h7_test --generate-page page_h7_2
     public void convertToLas(String inputPath, String outPath){
         //pdal translate D:\360Downloads\pcl_files\71_final_stl.pcd D:\360Downloads\pcl_files\71_final.las
         //cd /d %~dp0
